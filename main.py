@@ -43,7 +43,8 @@ def main():
         assert config.total_bs % world_size == 0
         config.dataset.train.others.bs = config.total_bs // world_size
     else:
-        config.dataset.train.others.bs = config.total_bs
+        config.dataset.partial.train.others.bs = config.total_bs
+        config.dataset.complete.train.others.bs = config.total_bs
     # log 
     log_args_to_file(args, 'args', logger = logger)
     log_config_to_file(config, 'config', logger = logger)
