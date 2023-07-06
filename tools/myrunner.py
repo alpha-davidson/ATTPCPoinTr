@@ -3,7 +3,7 @@ import numpy as np
 import torch.nn as nn
 import os
 import json
-from tools import builder
+from tools import mybuilder as builder
 from utils import misc, dist_utils
 import time
 from utils.logger import *
@@ -14,8 +14,8 @@ from extensions.chamfer_dist import ChamferDistanceL1, ChamferDistanceL2
 def run_net(args, config, train_writer=None, val_writer=None):
     logger = get_logger(args.log_name)
     # build dataset
-    (train_sampler, partial_train_dataloader, complete_train_dataloader), (_, partial_test_dataloader, complete_test_dataloader) = builder.dataset_builder(args, config.dataset.partial.train, config.dataset.complete.train), \
-                                                            builder.dataset_builder(args, config.dataset.partial.val, config.dataset.complete.val)
+    (train_sampler, train_dataloader) = builder.dataset_builder(args, config.dataset.train)
+    (_, test_dataloader) = builder.dataset_builder(args, config.dataset.val)
     # build model
     base_model = builder.model_builder(config.model)
     if args.use_gpu:
@@ -90,14 +90,13 @@ def run_net(args, config, train_writer=None, val_writer=None):
         num_iter = 0
 
         base_model.train()  # set model to training mode
-        n_batches = len(partial_train_dataloader)
-        for idx, x in enumerate(zip(partial_train_dataloader, complete_train_dataloader)):
-            p, c = x
-            taxonomy_ids, model_ids, partial_data = p
-            _, __, complete_data = c
+        n_batches = len(train_dataloader)
+        for idx, (feats, labels) in enumerate(train_dataloader):
+            partial_data = feats
+            complete_data = labels
             data_time.update(time.time() - batch_start_time)
-            npoints = config.dataset.partial.train._base_.N_POINTS
-            dataset_name = config.dataset.partial.train._base_.NAME
+            # npoints = config.dataset.partial.train._base_.N_POINTS
+            dataset_name = 'DummyData -- Lines'
             if  'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
                 # partial = data[0].cuda()
                 # gt = data[1].cuda()
@@ -114,9 +113,9 @@ def run_net(args, config, train_writer=None, val_writer=None):
                 pass
             
             elif 'Dummy' in dataset_name:
-                gt = partial_data.cuda()
+                gt = complete_data.cuda()
                 # # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
-                partial = complete_data.cuda()
+                partial = partial_data.cuda()
                 pass
 
             else:
@@ -181,7 +180,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
         if epoch % args.val_freq == 0:
             # Validate the current model
-            metrics = validate(base_model, partial_test_dataloader, complete_test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
+            metrics = validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
 
             # Save ckeckpoints
             if  metrics.better_than(best_metrics):
@@ -194,27 +193,28 @@ def run_net(args, config, train_writer=None, val_writer=None):
         train_writer.close()
         val_writer.close()
 
-def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger = None):
+def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger = None):
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
     base_model.eval()  # set model to eval mode
 
     test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
     test_metrics = AverageMeter(Metrics.names())
     category_metrics = dict()
-    n_samples = len(partial_test_dataloader) # bs is 1
+    n_samples = len(test_dataloader) # bs is 1
 
     interval =  n_samples // 10
 
     with torch.no_grad():
-        for idx, x in enumerate(zip(partial_test_dataloader, complete_test_dataloader)):
-            p, c = x
-            taxonomy_ids, model_ids, partial_data = p
-            _, __, complete_data = c
-            taxonomy_id = taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
-            model_id = model_ids[0]
+        for idx, (feats, labels) in enumerate(test_dataloader):
+            p_data = feats
+            c_data = labels
+            # taxonomy_ids, model_ids, partial_data = p
+            # _, __, complete_data = c
+            taxonomy_id = 'Line' #taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
+            model_id = str(idx).zfill(4) #model_ids[0]
 
-            npoints = config.dataset.partial.val._base_.N_POINTS
-            dataset_name = config.dataset.partial.val._base_.NAME
+            npoints = config.dataset.val.complete.npoints
+            dataset_name = 'DummyData -- Lines'
             if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
                 # partial = data[0].cuda()
                 # gt = data[1].cuda()
@@ -224,9 +224,9 @@ def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoc
                 partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
                 partial = partial.cuda()
             elif 'Dummy' in dataset_name:
-                gt = partial_data.cuda()
+                gt = c_data.cuda()
                 # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
-                partial = complete_data.cuda()
+                partial = p_data.cuda()
             else:
                 raise NotImplementedError(f'Train phase do not support {dataset_name}')
 
@@ -257,10 +257,10 @@ def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoc
             else:
                 _metrics = [_metric.item() for _metric in _metrics]
 
-            for _taxonomy_id in taxonomy_ids:
-                if _taxonomy_id not in category_metrics:
-                    category_metrics[_taxonomy_id] = AverageMeter(Metrics.names())
-                category_metrics[_taxonomy_id].update(_metrics)
+            # for _taxonomy_id in taxonomy_ids:
+            if taxonomy_id not in category_metrics:
+                category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
+            category_metrics[taxonomy_id].update(_metrics)
 
 
             if val_writer is not None and idx % 200 == 0:
@@ -292,7 +292,7 @@ def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoc
             torch.cuda.synchronize()
      
     # Print testing results
-    shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
+    # shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print_log('============================ TEST RESULTS ============================',logger=logger)
     msg = ''
     msg += 'Taxonomy\t'
