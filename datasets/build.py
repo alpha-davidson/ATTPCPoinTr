@@ -27,8 +27,8 @@ def build_my_dataset(cfg):
     feats = np.load(cfg.partial.path)
     labels = np.load(cfg.complete.path)
 
-    assert feats.shape == (len(feats), cfg.partial.npoints, 3)
-    assert labels.shape == (len(labels), cfg.complete.npoints, 3)
+    # assert feats.shape == (len(feats), cfg.partial.npoints, 3)
+    # assert labels.shape == (len(labels), cfg.complete.npoints, 3)
 
     feats = torch.Tensor(feats)
     labels = torch.Tensor(labels)

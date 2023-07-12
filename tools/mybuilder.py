@@ -11,7 +11,7 @@ from models import build_model_from_cfg
 from utils.logger import *
 from utils.misc import *
 
-def dataset_builder(args, config):
+def dataset_builder(args, config, train=False):
     # dataset = build_dataset_from_cfg(config._base_, config.others)
     dataset = build_my_dataset(config)
     shuffle = False
@@ -25,7 +25,7 @@ def dataset_builder(args, config):
         assert 1 == 0; 'Currently not setup for multi GPU usage'
     else:
         sampler = None
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=1,
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=128 if train else 1,
                                                 shuffle = shuffle, 
                                                 drop_last = config.others.subset == 'train',
                                                 num_workers = int(args.num_workers),

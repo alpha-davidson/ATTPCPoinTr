@@ -14,7 +14,7 @@ from extensions.chamfer_dist import ChamferDistanceL1, ChamferDistanceL2
 def run_net(args, config, train_writer=None, val_writer=None):
     logger = get_logger(args.log_name)
     # build dataset
-    (train_sampler, train_dataloader) = builder.dataset_builder(args, config.dataset.train)
+    (train_sampler, train_dataloader) = builder.dataset_builder(args, config.dataset.train, train=True)
     (_, test_dataloader) = builder.dataset_builder(args, config.dataset.val)
     # build model
     base_model = builder.model_builder(config.model)
