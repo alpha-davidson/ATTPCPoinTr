@@ -25,7 +25,11 @@ def build_my_dataset(cfg):
     """
 
     feats = np.load(cfg.partial.path)
+    if feats.shape != (len(feats), len(feats[0]), 3):
+        feats = feats[:, :, :3]
     labels = np.load(cfg.complete.path)
+    if labels.shape != (len(labels), len(labels[0]), 3):
+        labels = labels[:, :, :3]
 
     # assert feats.shape == (len(feats), cfg.partial.npoints, 3)
     # assert labels.shape == (len(labels), cfg.complete.npoints, 3)
