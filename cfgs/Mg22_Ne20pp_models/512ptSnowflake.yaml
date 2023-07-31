@@ -1,0 +1,51 @@
+optimizer : {
+  type: Adam,
+  kwargs: {
+  lr : 0.001, 
+  weight_decay : 0
+}}
+
+
+scheduler: {
+  type: GradualWarmup,
+  kwargs_1: {
+    step_size: 50,
+    gamma : 0.5
+  },
+  kwargs_2: {
+    multiplier: 1,
+    total_epoch: 200,
+  }
+}
+
+
+dataset : {
+  train : { partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/2cut_scaled_Mg22_zsliced_size256_train.npy,
+                        npoints: 256},
+            complete : { path: data/Mg22-Ne20pp/simulated/512c/scaled_Mg22_size512_train.npy,
+                         npoints: 512},
+            others : { subset: 'train'}},
+  test : {  partial : { path: data/Mg22-Ne20pp/experimental/256c/Mg22_exp_A50_noNull_size256_scaled_XYZAPE.npy,
+                        npoints: 256},
+            complete : { path: data/Mg22-Ne20pp/experimental/256c/Mg22_exp_A50_noNull_size256_scaled_XYZAPE.npy,
+                         npoints: 512},
+            others : { subset: 'test'}},
+  val : {   partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/2cut_scaled_Mg22_zsliced_size256_val.npy,
+                        npoints: 256},
+            complete : { path: data/Mg22-Ne20pp/simulated/512c/scaled_Mg22_size512_val.npy,
+                      npoints: 512},
+            others : { subset: 'val'}}}  
+            
+model : {
+  NAME: SnowFlakeNet, 
+  dim_feat: 512, 
+  num_pc: 128, 
+  num_p0: 256, 
+  radius: 1, 
+  up_factors: [2, 1]
+  }
+total_bs : 64
+step_per_update: 1
+max_epoch : 500
+
+consider_metric: CDL1

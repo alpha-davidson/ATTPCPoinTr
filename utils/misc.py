@@ -207,23 +207,32 @@ def seprate_point_cloud(xyz, num_points, crop, fixed_points = None, padding_zero
 def get_ptcloud_img(ptcloud):
     fig = plt.figure(figsize=(8, 8))
 
-    x, z, y = ptcloud.transpose(1, 0)
+    # x, z, y = ptcloud.transpose(1, 0)
+    x = ptcloud[:, 0]
+    y = ptcloud[:, 1]
+    z = ptcloud[:, 2]
     try:
         ax = fig.gca(projection=Axes3D.name, adjustable='box')
     except:
         ax = fig.add_subplot(projection=Axes3D.name, adjustable='box')
-    ax.axis('off')
+    # ax.axis('off')
     # ax.axis('scaled')
-    ax.view_init(30, 45)
-    max, min = np.max(ptcloud), np.min(ptcloud)
-    ax.set_xbound(min, max)
-    ax.set_ybound(min, max)
-    ax.set_zbound(min, max)
-    ax.scatter(x, y, z, zdir='z', c=x, cmap='jet')
+    # ax.view_init(30, 45)
+    maximum, minimum = np.max(ptcloud), np.min(ptcloud)
+    ax.set_xbound(minimum, maximum)
+    ax.set_ybound(minimum, maximum)
+    ax.set_zbound(minimum, maximum)
+    ax.scatter(x, y, z, zdir='z')
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
 
     fig.canvas.draw()
-    img = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    img = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
     img = img.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close()
+
     return img
 
 
@@ -336,3 +345,190 @@ class GradualWarmupScheduler(_LRScheduler):
                 return super(GradualWarmupScheduler, self).step(epoch)
         else:
             self.step_ReduceLROnPlateau(metrics, epoch)
+
+
+def better_img(event, idx, out=False, gt=False):
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    xs = event[:, 0]
+    ys = event[:, 1]
+    zs = event[:, 2]
+
+    ax.scatter(xs, ys, zs)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+
+    if out:
+        plt.savefig('./data/Mg22-Ne20pp/data/64p/inference_imgs/event'+str(idx).zfill(3)+'.png')
+    elif gt:
+        plt.savefig('./data/Mg22-Ne20pp/data/64p/gt_imgs/event'+str(idx).zfill(3)+'.png')
+    else:
+        plt.savefig('./data/Mg22-Ne20pp/data/64p/partial_imgs/event'+str(idx).zfill(3)+'.png')
+    plt.close()
+
+    return
+
+
+def get_extremes(event):
+
+    maxes = []
+    mins = []
+
+    for i in range(3):
+        maxes.append(np.max(event[:, i]))
+        mins.append(np.min(event[:, i]))
+
+    return maxes, mins
+
+
+def rescale_feats(xs, ys, zs):
+    RANGES = {
+            'MIN_X': -270.0,
+            'MAX_X': 270.0,
+            'MIN_Y': -270.0,
+            'MAX_Y': 270.0,
+            'MIN_Z': -185.0,
+            'MAX_Z': 1155.0
+        }
+    xs = xs * (RANGES['MAX_X'] - RANGES['MIN_X']) + RANGES['MIN_X']
+    ys = ys * (RANGES['MAX_Y'] - RANGES['MIN_Y']) + RANGES['MIN_Y']
+    zs = zs * (RANGES['MAX_Z'] - RANGES['MIN_Z']) + RANGES['MIN_Z']
+
+    return xs, ys, zs
+
+
+def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
+
+    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+
+    RANGES = {
+            'MIN_X': -270.0,
+            'MAX_X': 270.0,
+            'MIN_Y': -270.0,
+            'MAX_Y': 270.0,
+            'MIN_Z': -185.0,
+            'MAX_Z': 1155.0
+        }
+
+    fig, (input_ax, output_ax, gt_ax) = plt.subplots(1, 3, figsize=(12,6), subplot_kw=dict(projection='3d'))
+
+    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2])
+    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2])
+    gt_xs, gt_ys, gt_zs = rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2])
+
+    input_ax.scatter(input_xs, input_zs, input_ys, s=4)
+    output_ax.scatter(output_xs, output_zs, output_ys, s=4)
+    gt_ax.scatter(gt_xs, gt_zs, gt_ys, s=4)
+
+    # axes = [input_ax, output_ax, gt_ax]
+
+    # for ax in axes:
+    #     ax.set_xlabel('X')
+    #     ax.set_ylabel('Z')
+    #     ax.set_zlabel('Y')
+
+    #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    #     ax.set_ylim(xmin=RANGES['MIN_Z'], xmax=RANGES['MAX_Z'])
+    #     ax.set_zlim(xmin=RANGES['MIN_Y'], xmax=RANGES['MAX_Y'])
+
+    input_ax.set_xlabel('X')
+    input_ax.set_ylabel('Z')
+    input_ax.set_zlabel('Y')
+
+    output_ax.set_xlabel('X')
+    output_ax.set_ylabel('Z')
+    output_ax.set_zlabel('Y')
+
+    gt_ax.set_xlabel('X')
+    gt_ax.set_ylabel('Z')
+    gt_ax.set_zlabel('Y')
+
+    input_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    input_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    input_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+
+    output_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    output_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    output_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+
+    gt_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    gt_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    gt_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+
+    input_ax.set_title('Input')
+    output_ax.set_title('Output')
+    gt_ax.set_title('Ground Truth')
+
+    fig.suptitle('Event '+str(idx).zfill(4))
+
+    if path == '':
+        path = '/'.join(cfg.split('/')[:-1]) + '/imgs/'
+
+    plt.savefig(path+'event'+str(idx).zfill(4)+'.png')
+    plt.close()
+
+
+def experimental_img(input_pc, output_pc, idx, path, cfg):
+
+    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+
+    RANGES = {
+            'MIN_X': -270.0,
+            'MAX_X': 270.0,
+            'MIN_Y': -270.0,
+            'MAX_Y': 270.0,
+            'MIN_Z': -185.0,
+            'MAX_Z': 1155.0
+        }
+
+    fig, (input_ax, output_ax) = plt.subplots(1, 2, figsize=(12,6), subplot_kw=dict(projection='3d'))
+
+    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2])
+    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2])
+
+    input_ax.scatter(input_xs, input_zs, input_ys, s=4)
+    output_ax.scatter(output_xs, output_zs, output_ys, s=4)
+
+    # axes = [input_ax, output_ax]
+
+    # for ax in axes:
+    #     ax.set_xlabel('X')
+    #     ax.set_ylabel('Z')
+    #     ax.set_zlabel('Y')
+
+    #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    #     ax.set_ylim(xmin=RANGES['MIN_Z'], xmax=RANGES['MAX_Z'])
+    #     ax.set_zlim(xmin=RANGES['MIN_Y'], xmax=RANGES['MAX_Y'])
+
+    input_ax.set_xlabel('X')
+    input_ax.set_ylabel('Z')
+    input_ax.set_zlabel('Y')
+
+    output_ax.set_xlabel('X')
+    output_ax.set_ylabel('Z')
+    output_ax.set_zlabel('Y')
+
+    input_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    input_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    input_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+
+    output_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    output_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    output_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+
+    input_ax.set_title('Input')
+    output_ax.set_title('Output')
+
+    fig.suptitle('Event '+str(idx).zfill(4))
+
+    if path == '':
+        path = '/'.join(cfg.split('/')[:-1]) + '/imgs/'
+
+    plt.savefig(path+'event'+str(idx).zfill(4)+'.png')
+    plt.close()

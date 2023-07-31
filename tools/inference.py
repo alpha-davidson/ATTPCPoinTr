@@ -13,7 +13,7 @@ sys.path.append(os.path.join(BASE_DIR, '../'))
 import torch
 print(torch.cuda.is_available())
 
-from tools import builder
+from tools import mybuilder as builder
 from utils.config import cfg_from_yaml_file
 from utils import misc
 from datasets.io import IO
@@ -43,12 +43,16 @@ def get_args():
         'Default not saving the visualization images.')
     parser.add_argument(
         '--device', default='cuda:0', help='Device used for inference')
+    parser.add_argument('--num_workers', type=int, default=4) 
+    parser.add_argument('--experimental', action='store_true', default=False, help='Flag if the input cloud is from experimental data -- Default == False')
+    parser.add_argument('--save_img_path', type=str, default='', help='Where to save output image')
+    parser.add_argument('--n_imgs', type=int, default=20, help='sets the number of images saved -- default == first 20 events')
     args = parser.parse_args()
 
-    assert args.save_vis_img or (args.out_pc_root != '')
+    # assert args.save_vis_img or (args.out_pc_root != '')
     assert args.model_config is not None
     assert args.model_checkpoint is not None
-    assert (args.pc != '') or (args.pc_root != '')
+    # assert (args.pc != '') or (args.pc_root != '')
 
     return args
 
@@ -101,8 +105,41 @@ def inference_single(model, pc_path, args, config, root=None):
     
     return
 
+
+def my_inference(model, args, config):
+
+    with torch.no_grad():
+        
+        _, data_loader = builder.dataset_builder(args, config.dataset.test)
+
+        for idx, (feats, labels) in enumerate(data_loader):
+
+            if idx == args.n_imgs:
+                break
+
+            partial = feats.cuda()
+            gt = labels.cuda()
+
+            ret = model(partial)
+
+            input_pc = partial.squeeze().detach().cpu().numpy()
+            output_pc = ret[-1].squeeze().cpu().numpy()
+            gt_pc = gt.squeeze().detach().cpu().numpy()
+
+            # misc.better_img(input_pc, idx)
+            # misc.better_img(output_pc, idx, out=True)
+            # misc.better_img(gt_pc, idx, gt=True)
+
+            if args.experimental:
+                misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+            else:
+                misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+
+    return
+
 def main():
     args = get_args()
+    args.distributed = False
 
     # init config
     config = cfg_from_yaml_file(args.model_config)
@@ -112,12 +149,15 @@ def main():
     base_model.to(args.device.lower())
     base_model.eval()
 
-    if args.pc_root != '':
-        pc_file_list = os.listdir(args.pc_root)
-        for pc_file in pc_file_list:
-            inference_single(base_model, pc_file, args, config, root=args.pc_root)
-    else:
-        inference_single(base_model, args.pc, args, config)
+    # if args.pc_root != '':
+    #     pc_file_list = os.listdir(args.pc_root)
+    #     for pc_file in pc_file_list:
+    #         inference_single(base_model, pc_file, args, config, root=args.pc_root)
+    # else:
+    #     inference_single(base_model, args.pc, args, config)
+
+    my_inference(base_model, args, config)
+    # print(args.experimental)
 
 if __name__ == '__main__':
     main()

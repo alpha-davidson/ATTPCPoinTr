@@ -91,7 +91,9 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
         base_model.train()  # set model to training mode
         n_batches = len(train_dataloader)
+        testing_flag = False
         for idx, (feats, labels) in enumerate(train_dataloader):
+            testing_flag = True
             partial_data = feats
             complete_data = labels
             data_time.update(time.time() - batch_start_time)
@@ -124,6 +126,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
             num_iter += 1
            
             ret = base_model(partial)
+            # coarse_points = ret[0]
+            # dense_points = ret[-1]
             
             sparse_loss, dense_loss = base_model.module.get_loss(ret, gt, epoch)
          
@@ -140,18 +144,17 @@ def run_net(args, config, train_writer=None, val_writer=None):
             if args.distributed:
                 sparse_loss = dist_utils.reduce_tensor(sparse_loss, args)
                 dense_loss = dist_utils.reduce_tensor(dense_loss, args)
-                losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
+                losses.update([sparse_loss.item(), dense_loss.item()])
             else:
-                losses.update([sparse_loss.item() * 1000, dense_loss.item() * 1000])
-
+                losses.update([sparse_loss.item(), dense_loss.item()])
 
             if args.distributed:
                 torch.cuda.synchronize()
 
             n_itr = epoch * n_batches + idx
             if train_writer is not None:
-                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss.item() * 1000, n_itr)
-                train_writer.add_scalar('Loss/Batch/Dense', dense_loss.item() * 1000, n_itr)
+                train_writer.add_scalar('Loss/Batch/Sparse', sparse_loss.item(), n_itr)
+                train_writer.add_scalar('Loss/Batch/Dense', dense_loss.item(), n_itr)
 
             batch_time.update(time.time() - batch_start_time)
             batch_start_time = time.time()
@@ -171,6 +174,9 @@ def run_net(args, config, train_writer=None, val_writer=None):
         else:
             scheduler.step()
         epoch_end_time = time.time()
+
+        assert testing_flag, 'Did not go into data_loader loop'
+        assert losses._count[0] != 0, f'losses._count == {losses._count}'
 
         if train_writer is not None:
             train_writer.add_scalar('Loss/Epoch/Sparse', losses.avg(0), epoch)
@@ -228,7 +234,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
                 partial = p_data.cuda()
             else:
-                raise NotImplementedError(f'Train phase do not support {dataset_name}')
+                raise NotImplementedError(f'Train phase does not support {dataset_name}')
 
             ret = base_model(partial)
             coarse_points = ret[0]
@@ -245,7 +251,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
                 dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
 
-            test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
+            test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
             # dense_points_all = dist_utils.gather_tensor(dense_points, args)
             # gt_all = dist_utils.gather_tensor(gt, args)
@@ -263,22 +269,24 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             category_metrics[taxonomy_id].update(_metrics)
 
 
-            if val_writer is not None and idx % 200 == 0:
+            if val_writer is not None and idx % 200 == 0 and epoch == 500:
+
+                gt_ptcloud = gt.squeeze().cpu().numpy()
+                gt_ptcloud_img = misc.get_ptcloud_img(gt_ptcloud)
+                val_writer.add_image('Event%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
+
                 input_pc = partial.squeeze().detach().cpu().numpy()
                 input_pc = misc.get_ptcloud_img(input_pc)
-                val_writer.add_image('Model%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
+                val_writer.add_image('Event%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
 
-                sparse = coarse_points.squeeze().cpu().numpy()
-                sparse_img = misc.get_ptcloud_img(sparse)
-                val_writer.add_image('Model%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
+                # sparse = coarse_points.squeeze().cpu().numpy()
+                # sparse_img = misc.get_ptcloud_img(sparse)
+                # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
 
                 dense = dense_points.squeeze().cpu().numpy()
                 dense_img = misc.get_ptcloud_img(dense)
-                val_writer.add_image('Model%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
+                val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
                 
-                gt_ptcloud = gt.squeeze().cpu().numpy()
-                gt_ptcloud_img = misc.get_ptcloud_img(gt_ptcloud)
-                val_writer.add_image('Model%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
         
             if (idx+1) % interval == 0:
                 print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
