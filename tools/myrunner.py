@@ -134,6 +134,9 @@ def run_net(args, config, train_writer=None, val_writer=None):
             _loss = sparse_loss + dense_loss 
             _loss.backward()
 
+            assert np.sum(np.isnan(ret[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isinf(ret[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- Infs in dataset at epoch == {epoch} and batch == {idx}'
+
             # forward
             if num_iter == config.step_per_update:
                 torch.nn.utils.clip_grad_norm_(base_model.parameters(), getattr(config, 'grad_norm_clip', 10), norm_type=2)
@@ -186,13 +189,17 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
         if epoch % args.val_freq == 0:
             # Validate the current model
+            assert np.sum(np.isnan(ret[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isinf(ret[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- Infs in dataset at epoch == {epoch} and batch == {idx}'
             metrics = validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
 
             # Save ckeckpoints
             if  metrics.better_than(best_metrics):
                 best_metrics = metrics
                 builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-best', args, logger = logger)
-        builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-last', args, logger = logger)      
+        builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, 'ckpt-last', args, logger = logger)
+        if epoch % 20 == 0:
+            builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch{epoch}', args, logger = logger)
         if (config.max_epoch - epoch) < 2:
             builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch-{epoch:03d}', args, logger = logger)     
     if train_writer is not None and val_writer is not None:
@@ -269,7 +276,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             category_metrics[taxonomy_id].update(_metrics)
 
 
-            if val_writer is not None and idx % 200 == 0 and epoch == 500:
+            if val_writer is not None and idx % 200 == 0:
 
                 gt_ptcloud = gt.squeeze().cpu().numpy()
                 gt_ptcloud_img = misc.get_ptcloud_img(gt_ptcloud)
@@ -284,6 +291,8 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
 
                 dense = dense_points.squeeze().cpu().numpy()
+                assert np.sum(np.isnan(dense)) == 0, f'Inside Validate -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
+                assert np.sum(np.isinf(dense)) == 0, f'Inside Validate -- Infs in dataset at epoch == {epoch} and batch == {idx}'
                 dense_img = misc.get_ptcloud_img(dense)
                 val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
                 
