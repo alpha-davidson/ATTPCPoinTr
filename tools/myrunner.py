@@ -14,7 +14,7 @@ from extensions.chamfer_dist import ChamferDistanceL1, ChamferDistanceL2
 def run_net(args, config, train_writer=None, val_writer=None):
     logger = get_logger(args.log_name)
     # build dataset
-    (train_sampler, train_dataloader) = builder.dataset_builder(args, config.dataset.train, train=True)
+    (train_sampler, train_dataloader) = builder.dataset_builder(args, config.dataset.train)
     (_, test_dataloader) = builder.dataset_builder(args, config.dataset.val)
     # build model
     base_model = builder.model_builder(config.model)
@@ -148,6 +148,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
             else:
                 losses.update([sparse_loss.item(), dense_loss.item()])
 
+            assert np.sum(np.isnan(losses.val())) == 0, f'NaN found in losses.val() at epoch {epoch}, batch {idx}'
+
             if args.distributed:
                 torch.cuda.synchronize()
 
@@ -240,6 +242,8 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             coarse_points = ret[0]
             dense_points = ret[-1]
 
+            # assert not np.array_equal(dense_points.squeeze().cpu().numpy()[0], dense_points.squeeze().cpu().numpy()[1]), f'Identical Events at epcoh {epoch} in batch {idx}'
+
             sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
             sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
             dense_loss_l1 =  ChamferDisL1(dense_points, gt)
@@ -269,14 +273,14 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             category_metrics[taxonomy_id].update(_metrics)
 
 
-            if val_writer is not None and idx % 200 == 0 and epoch == 500:
+            if val_writer is not None and idx % 200 == 0:
 
                 gt_ptcloud = gt.squeeze().cpu().numpy()
-                gt_ptcloud_img = misc.get_ptcloud_img(gt_ptcloud)
+                gt_ptcloud_img = misc.better_img(gt_ptcloud)
                 val_writer.add_image('Event%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
 
                 input_pc = partial.squeeze().detach().cpu().numpy()
-                input_pc = misc.get_ptcloud_img(input_pc)
+                input_pc = misc.better_img(input_pc)
                 val_writer.add_image('Event%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
 
                 # sparse = coarse_points.squeeze().cpu().numpy()
@@ -284,14 +288,15 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
 
                 dense = dense_points.squeeze().cpu().numpy()
-                dense_img = misc.get_ptcloud_img(dense)
+                assert np.sum(np.isnan(dense)) == 0, f'{np.sum(np.isnan(dense))} NaNs found in predicted cloud at epoch {epoch}, val batch {idx}'
+                dense_img = misc.better_img(dense)
                 val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
                 
         
-            if (idx+1) % interval == 0:
-                print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
-                            (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
-                            ['%.4f' % m for m in _metrics]), logger=logger)
+            # if (idx+1) % interval == 0:
+            print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
+                        (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
+                        ['%.4f' % m for m in _metrics]), logger=logger)
         for _,v in category_metrics.items():
             test_metrics.update(v.avg())
         print_log('[Validation] EPOCH: %d  Metrics = %s' % (epoch, ['%.4f' % m for m in test_metrics.avg()]), logger=logger)

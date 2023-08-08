@@ -110,7 +110,7 @@ def my_inference(model, args, config):
 
     with torch.no_grad():
         
-        _, data_loader = builder.dataset_builder(args, config.dataset.test)
+        _, data_loader = builder.dataset_builder(args, config.dataset.test, test=True)
 
         for idx, (feats, labels) in enumerate(data_loader):
 
@@ -123,7 +123,7 @@ def my_inference(model, args, config):
             ret = model(partial)
 
             input_pc = partial.squeeze().detach().cpu().numpy()
-            output_pc = ret[-1].squeeze().cpu().numpy()
+            output_pc = ret[-1].squeeze().detach().cpu().numpy()
             gt_pc = gt.squeeze().detach().cpu().numpy()
 
             # misc.better_img(input_pc, idx)

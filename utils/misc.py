@@ -347,32 +347,43 @@ class GradualWarmupScheduler(_LRScheduler):
             self.step_ReduceLROnPlateau(metrics, epoch)
 
 
-def better_img(event, idx, out=False, gt=False):
+def better_img(event):
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8, 10))
     ax = fig.add_subplot(projection='3d')
 
-    xs = event[:, 0]
-    ys = event[:, 1]
-    zs = event[:, 2]
+    xs = event[0, :, 0]
+    ys = event[0, :, 1]
+    zs = event[0, :, 2]
 
-    ax.scatter(xs, ys, zs)
+    RANGES = {
+            'MIN_X': -270.0,
+            'MAX_X': 270.0,
+            'MIN_Y': -270.0,
+            'MAX_Y': 270.0,
+            'MIN_Z': -185.0,
+            'MAX_Z': 1155.0
+        }
+    xs = xs * (RANGES['MAX_X'] - RANGES['MIN_X']) + RANGES['MIN_X']
+    ys = ys * (RANGES['MAX_Y'] - RANGES['MIN_Y']) + RANGES['MIN_Y']
+    zs = zs * (RANGES['MAX_Z'] - RANGES['MIN_Z']) + RANGES['MIN_Z']
+
+    ax.scatter(xs, zs, ys)
 
     ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    ax.set_ylabel('Z')
+    ax.set_zlabel('Y')
 
-    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+    ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
+    ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
 
-    if out:
-        plt.savefig('./data/Mg22-Ne20pp/data/64p/inference_imgs/event'+str(idx).zfill(3)+'.png')
-    elif gt:
-        plt.savefig('./data/Mg22-Ne20pp/data/64p/gt_imgs/event'+str(idx).zfill(3)+'.png')
-    else:
-        plt.savefig('./data/Mg22-Ne20pp/data/64p/partial_imgs/event'+str(idx).zfill(3)+'.png')
+    fig.canvas.draw()
+    img = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    img = img.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
     plt.close()
 
-    return
+    return img
 
 
 def get_extremes(event):
@@ -434,8 +445,8 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
     #     ax.set_zlabel('Y')
 
     #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    #     ax.set_ylim(xmin=RANGES['MIN_Z'], xmax=RANGES['MAX_Z'])
-    #     ax.set_zlim(xmin=RANGES['MIN_Y'], xmax=RANGES['MAX_Y'])
+    #     ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    #     ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
 
     input_ax.set_xlabel('X')
     input_ax.set_ylabel('Z')
@@ -503,8 +514,8 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
     #     ax.set_zlabel('Y')
 
     #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    #     ax.set_ylim(xmin=RANGES['MIN_Z'], xmax=RANGES['MAX_Z'])
-    #     ax.set_zlim(xmin=RANGES['MIN_Y'], xmax=RANGES['MAX_Y'])
+    #     ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
+    #     ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
 
     input_ax.set_xlabel('X')
     input_ax.set_ylabel('Z')
