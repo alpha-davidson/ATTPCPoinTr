@@ -15,7 +15,6 @@ PoinTr is a transformer-based model for point cloud completion.  By representing
  ### The most successful model for ALPhA's purposes so far has been [SnowflakeNet](https://github.com/AllenXiangX/SnowflakeNet/tree/main), which is included in this repository.
 
 
-
 ## Usage
 
 ### [*** ALPhA Quick Start Guide ***](https://drive.google.com/file/d/1xV3PPMM5xpkEPl6BFhsQOH4cuDxEU1c8/view?usp=sharing)
@@ -37,7 +36,7 @@ pip install -r requirements.txt
 
 #### Building Pytorch Extensions for Chamfer Distance, PointNet++ and kNN
 
-*NOTE:* PyTorch >= 1.7 and GCC >= 4.9 are required. I have PyTorch = 2.0.1 and Python = 3.10.11
+*NOTE:* PyTorch >= 1.7 and GCC >= 4.9 are required. My environment has PyTorch = 2.0.1 and Python = 3.10.11
 
 ```
 # Chamfer Distance
@@ -63,7 +62,8 @@ That will fix the `ModuleNotFoundError`.
 
 ### Dataset
 
-The details of the data used so far for this project can be found in the ALPhA #data Slack Channel.
+
+The details of the data used so far for this project can be found in the ALPhA #data Slack Channel. Simulated 22Mg data has been the primary training dataset.
 
 ### Inference
 
@@ -72,6 +72,7 @@ To inference sample(s) with pretrained model
 ```
 python tools/inference.py \
 ${POINTR_CONFIG_FILE} ${POINTR_CHECKPOINT_FILE} \
+
 [--experimental] \
 [--save_img_path <dir>] \
 [--n_imgs <number>]
@@ -83,6 +84,7 @@ python tools/inference.py \
 cfgs/Mg22_Ne20pp_models/MidCutSnowflake.yaml path/to/ckpt.pth \ 
 --save_img_path ./imgs/  \
 --n_imgs=10 \
+
 ```
 
 ### Evaluation
@@ -126,6 +128,7 @@ CUDA_VISIBLE_DEVICES=0 python KITTI_metric.py \
 
 To train a point cloud completion model from scratch, run:
 
+
 ```
 # Use DataParallel (DP)
 bash ./scripts/train.sh <GPUIDS> \
@@ -155,6 +158,7 @@ Train a PoinTr model with a single GPU:
 ```
 bash ./scripts/train.sh 0 \
     --config ./cfgs/KITTI_models/PoinTr.yaml \
+
     --exp_name example
 ```
 
@@ -171,7 +175,9 @@ MIT License
 
 ## Acknowledgements
 
+
 Our code is inspired by [GRNet](https://github.com/hzxie/GRNet) and [mmdetection3d](https://github.com/open-mmlab/mmdetection3d) and [SnowflakeNet](https://github.com/AllenXiangX/SnowflakeNet/tree/main).
+
 
 ## Citation
 If you find our work useful in your research, please consider citing: 

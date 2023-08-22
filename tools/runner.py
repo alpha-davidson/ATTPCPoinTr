@@ -205,6 +205,8 @@ def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoc
 
     interval =  n_samples // 10
 
+    interval =  n_samples // 10
+
     with torch.no_grad():
         for idx, x in enumerate(zip(partial_test_dataloader, complete_test_dataloader)):
             p, c = x
@@ -212,7 +214,6 @@ def validate(base_model, partial_test_dataloader, complete_test_dataloader, epoc
             _, __, complete_data = c
             taxonomy_id = taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
             model_id = model_ids[0]
-
             npoints = config.dataset.partial.val._base_.N_POINTS
             dataset_name = config.dataset.partial.val._base_.NAME
             if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
