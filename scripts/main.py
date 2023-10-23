@@ -63,7 +63,6 @@ def main():
     if args.test:
         test_net(args, config)
     else:
-        
         run_net(args, config, train_writer, val_writer)
 
 

@@ -133,7 +133,10 @@ dmypy.json
 *.weights
 *.pt
 *.npy
+*.h5
+*.txt
 
+ATTPCPoinTr1/
 experiments/
 data/ShapeNet55-34/shapenet_pc
 data/ShapeNet55-34/clean*

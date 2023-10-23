@@ -1,0 +1,579 @@
+running install
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` directly.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: EasyInstallDeprecationWarning: easy_install command is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` and ``easy_install``.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://github.com/pypa/setuptools/issues/917 for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()
+running bdist_egg
+running egg_info
+creating pointnet2.egg-info
+writing pointnet2.egg-info/PKG-INFO
+writing dependency_links to pointnet2.egg-info/dependency_links.txt
+writing requirements to pointnet2.egg-info/requires.txt
+writing top-level names to pointnet2.egg-info/top_level.txt
+writing manifest file 'pointnet2.egg-info/SOURCES.txt'
+reading manifest file 'pointnet2.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'pointnet2.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build
+creating build/lib
+creating build/lib/pointnet2
+copying pointnet2/__init__.py -> build/lib/pointnet2
+copying pointnet2/_version.py -> build/lib/pointnet2
+copying pointnet2/train.py -> build/lib/pointnet2
+creating build/lib/pointnet2/models
+copying pointnet2/models/pointnet2_ssg_sem.py -> build/lib/pointnet2/models
+copying pointnet2/models/pointnet2_msg_sem.py -> build/lib/pointnet2/models
+copying pointnet2/models/pointnet2_msg_cls.py -> build/lib/pointnet2/models
+copying pointnet2/models/__init__.py -> build/lib/pointnet2/models
+copying pointnet2/models/pointnet2_ssg_cls.py -> build/lib/pointnet2/models
+creating build/lib/pointnet2/data
+copying pointnet2/data/Indoor3DSemSegLoader.py -> build/lib/pointnet2/data
+copying pointnet2/data/__init__.py -> build/lib/pointnet2/data
+copying pointnet2/data/ModelNet40Loader.py -> build/lib/pointnet2/data
+copying pointnet2/data/data_utils.py -> build/lib/pointnet2/data
+creating build/bdist.linux-x86_64
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/pointnet2
+creating build/bdist.linux-x86_64/egg/pointnet2/models
+copying build/lib/pointnet2/models/__init__.py -> build/bdist.linux-x86_64/egg/pointnet2/models
+copying build/lib/pointnet2/models/pointnet2_msg_sem.py -> build/bdist.linux-x86_64/egg/pointnet2/models
+copying build/lib/pointnet2/models/pointnet2_ssg_sem.py -> build/bdist.linux-x86_64/egg/pointnet2/models
+copying build/lib/pointnet2/models/pointnet2_ssg_cls.py -> build/bdist.linux-x86_64/egg/pointnet2/models
+copying build/lib/pointnet2/models/pointnet2_msg_cls.py -> build/bdist.linux-x86_64/egg/pointnet2/models
+creating build/bdist.linux-x86_64/egg/pointnet2/data
+copying build/lib/pointnet2/data/__init__.py -> build/bdist.linux-x86_64/egg/pointnet2/data
+copying build/lib/pointnet2/data/data_utils.py -> build/bdist.linux-x86_64/egg/pointnet2/data
+copying build/lib/pointnet2/data/ModelNet40Loader.py -> build/bdist.linux-x86_64/egg/pointnet2/data
+copying build/lib/pointnet2/data/Indoor3DSemSegLoader.py -> build/bdist.linux-x86_64/egg/pointnet2/data
+copying build/lib/pointnet2/train.py -> build/bdist.linux-x86_64/egg/pointnet2
+copying build/lib/pointnet2/_version.py -> build/bdist.linux-x86_64/egg/pointnet2
+copying build/lib/pointnet2/__init__.py -> build/bdist.linux-x86_64/egg/pointnet2
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/models/__init__.py to __init__.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/models/pointnet2_msg_sem.py to pointnet2_msg_sem.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/models/pointnet2_ssg_sem.py to pointnet2_ssg_sem.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/models/pointnet2_ssg_cls.py to pointnet2_ssg_cls.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/models/pointnet2_msg_cls.py to pointnet2_msg_cls.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/data/__init__.py to __init__.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/data/data_utils.py to data_utils.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/data/ModelNet40Loader.py to ModelNet40Loader.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/data/Indoor3DSemSegLoader.py to Indoor3DSemSegLoader.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/train.py to train.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/_version.py to _version.cpython-310.pyc
+byte-compiling build/bdist.linux-x86_64/egg/pointnet2/__init__.py to __init__.cpython-310.pyc
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+copying pointnet2.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying pointnet2.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying pointnet2.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying pointnet2.egg-info/requires.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying pointnet2.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+zip_safe flag not set; analyzing archive contents...
+pointnet2.data.__pycache__.Indoor3DSemSegLoader.cpython-310: module references __file__
+pointnet2.data.__pycache__.ModelNet40Loader.cpython-310: module references __file__
+creating dist
+creating 'dist/pointnet2-3.0.0-py3.10.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing pointnet2-3.0.0-py3.10.egg
+creating /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/pointnet2-3.0.0-py3.10.egg
+Extracting pointnet2-3.0.0-py3.10.egg to /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages
+Adding pointnet2 3.0.0 to easy-install.pth file
+
+Installed /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/pointnet2-3.0.0-py3.10.egg
+Processing dependencies for pointnet2==3.0.0
+Searching for pytorch-lightning==0.7.1
+Reading https://pypi.org/simple/pytorch-lightning/
+Downloading https://files.pythonhosted.org/packages/61/9e/db4e1e3036e045a25d5c37617ded31a673a61f4befc62c5231818810b3a7/pytorch-lightning-0.7.1.tar.gz#sha256=d1848e0170b2eb88e25a6bc011bbecbbc0e1fcd47edb2d2b26070e36755f5b57
+Best match: pytorch-lightning 0.7.1
+Processing pytorch-lightning-0.7.1.tar.gz
+Writing /tmp/easy_install-0154de6c/pytorch-lightning-0.7.1/setup.cfg
+Running pytorch-lightning-0.7.1/setup.py -q bdist_egg --dist-dir /tmp/easy_install-0154de6c/pytorch-lightning-0.7.1/egg-dist-tmp-u734j9gs
+Partial import of `torchlightning` during the build process.
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/config/setupcfg.py:293: _DeprecatedConfig: Deprecated config in `setup.cfg`
+!!
+
+        ********************************************************************************
+        The license_file parameter is deprecated, use license_files instead.
+
+        By 2023-Oct-30, you need to update your project and remove deprecated calls
+        or your builds will no longer be supported.
+
+        See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+        ********************************************************************************
+
+!!
+  parsed = self.parsers.get(option_name, lambda x: x)(value)
+warning: no directories found matching 'wheelhouse'
+warning: no previously-included files matching '*.py[cod]' found under directory '__pycache__'
+warning: no previously-included files matching '*.orig' found under directory '__pycache__'
+warning: no previously-included files found matching '*.sh'
+warning: no previously-included files found matching '*.toml'
+warning: no previously-included files found matching '*.svg'
+warning: no previously-included files matching '*' found under directory 'tests'
+warning: no previously-included files matching '*' found under directory 'site'
+warning: no previously-included files found matching 'tests'
+warning: no previously-included files found matching 'docs'
+warning: no previously-included files found matching '*.yml'
+no previously-included directories found matching '.git'
+no previously-included directories found matching '.github'
+no previously-included directories found matching '.circleci'
+no previously-included directories found matching 'notebook*'
+no previously-included directories found matching 'temp*'
+no previously-included directories found matching 'test*'
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` directly.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/command/build_py.py:201: _Warning: Package 'pl_examples.full_examples.semantic_segmentation' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'pl_examples.full_examples.semantic_segmentation' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'pl_examples.full_examples.semantic_segmentation' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'pl_examples.full_examples.semantic_segmentation' to be distributed and are
+        already explicitly excluding 'pl_examples.full_examples.semantic_segmentation' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+  check.warn(importable)
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/command/build_py.py:201: _Warning: Package 'pl_examples.full_examples.semantic_segmentation.models.unet' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'pl_examples.full_examples.semantic_segmentation.models.unet' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'pl_examples.full_examples.semantic_segmentation.models.unet' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'pl_examples.full_examples.semantic_segmentation.models.unet' to be distributed and are
+        already explicitly excluding 'pl_examples.full_examples.semantic_segmentation.models.unet' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+  check.warn(importable)
+Adding pytorch-lightning 0.7.1 to easy-install.pth file
+detected new path './pointnet2-3.0.0-py3.10.egg'
+
+Installed /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/pytorch_lightning-0.7.1-py3.10.egg
+Searching for hydra-core==0.11.3
+Reading https://pypi.org/simple/hydra-core/
+Downloading https://files.pythonhosted.org/packages/28/2f/e8dbf1266062d4041cbdcd725cb91210d9811aefb9cdf5fc04cb381bf9b9/hydra_core-0.11.3-py3-none-any.whl#sha256=43ef27b4a32a70cbf566b10bd198def5c5d03cab212d4ea49e744aeb0c14a6b7
+Best match: hydra-core 0.11.3
+Processing hydra_core-0.11.3-py3-none-any.whl
+Installing hydra_core-0.11.3-py3-none-any.whl to /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages
+Adding hydra-core 0.11.3 to easy-install.pth file
+detected new path './pytorch_lightning-0.7.1-py3.10.egg'
+
+Installed /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/hydra_core-0.11.3-py3.10.egg
+Searching for future>=0.17.1
+Reading https://pypi.org/simple/future/
+Downloading https://files.pythonhosted.org/packages/8f/2e/cf6accf7415237d6faeeebdc7832023c90e0282aa16fd3263db0eb4715ec/future-0.18.3.tar.gz#sha256=34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307
+Best match: future 0.18.3
+Processing future-0.18.3.tar.gz
+Writing /tmp/easy_install-6t2wx8lj/future-0.18.3/setup.cfg
+Running future-0.18.3/setup.py -q bdist_egg --dist-dir /tmp/easy_install-6t2wx8lj/future-0.18.3/egg-dist-tmp-fgmgrvmr
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/config/setupcfg.py:293: _DeprecatedConfig: Deprecated config in `setup.cfg`
+!!
+
+        ********************************************************************************
+        The license_file parameter is deprecated, use license_files instead.
+
+        By 2023-Oct-30, you need to update your project and remove deprecated calls
+        or your builds will no longer be supported.
+
+        See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+        ********************************************************************************
+
+!!
+  parsed = self.parsers.get(option_name, lambda x: x)(value)
+warning: no files found matching '*.au' under directory 'tests'
+warning: no files found matching '*.gif' under directory 'tests'
+warning: no files found matching '*.txt' under directory 'tests'
+/home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` directly.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()
+zip_safe flag not set; analyzing archive contents...
+future.backports.test.__pycache__.ssl_servers.cpython-310: module references __file__
+future.backports.test.__pycache__.support.cpython-310: module references __file__
+future.standard_library.__pycache__.__init__.cpython-310: module references __file__
+future.standard_library.__pycache__.__init__.cpython-310: module references __path__
+future.utils.__pycache__.__init__.cpython-310: module MAY be using inspect.stack
+past.builtins.__pycache__.misc.cpython-310: module MAY be using inspect.stack
+past.translation.__pycache__.__init__.cpython-310: module references __file__
+past.translation.__pycache__.__init__.cpython-310: module references __path__
+Adding future 0.18.3 to easy-install.pth file
+detected new path './hydra_core-0.11.3-py3.10.egg'
+Installing futurize script to /home/DAVIDSON/taawal/.local/bin
+Installing pasteurize script to /home/DAVIDSON/taawal/.local/bin
+
+Installed /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/future-0.18.3-py3.10.egg
+Searching for omegaconf<1.5,>=1.4
+Reading https://pypi.org/simple/omegaconf/
+Downloading https://files.pythonhosted.org/packages/2f/53/d285f1faa36eca666f6d04ac17c5f3a9e72cedaeb530e663fdc025209780/omegaconf-1.4.1-py3-none-any.whl#sha256=01c9f93c3578dce7d42ce06f3d1305437322234ccc1accfc71d344d5e17413a1
+Best match: omegaconf 1.4.1
+Processing omegaconf-1.4.1-py3-none-any.whl
+Installing omegaconf-1.4.1-py3-none-any.whl to /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages
+Adding omegaconf 1.4.1 to easy-install.pth file
+detected new path './future-0.18.3-py3.10.egg'
+
+Installed /home/DAVIDSON/taawal/.local/lib/python3.10/site-packages/omegaconf-1.4.1-py3.10.egg
+Searching for tensorboard==2.14.1
+Best match: tensorboard 2.14.1
+Adding tensorboard 2.14.1 to easy-install.pth file
+detected new path './omegaconf-1.4.1-py3.10.egg'
+Installing tensorboard script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for torch==2.0.1
+Best match: torch 2.0.1
+Adding torch 2.0.1 to easy-install.pth file
+Installing convert-caffe2-to-onnx script to /home/DAVIDSON/taawal/.local/bin
+Installing convert-onnx-to-caffe2 script to /home/DAVIDSON/taawal/.local/bin
+Installing torchrun script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for numpy==1.26.0
+Best match: numpy 1.26.0
+Adding numpy 1.26.0 to easy-install.pth file
+Installing f2py script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for tqdm==4.66.1
+Best match: tqdm 4.66.1
+Adding tqdm 4.66.1 to easy-install.pth file
+Installing tqdm script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for Werkzeug==2.2.3
+Best match: Werkzeug 2.2.3
+Adding Werkzeug 2.2.3 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for tensorboard-data-server==0.7.1
+Best match: tensorboard-data-server 0.7.1
+Adding tensorboard-data-server 0.7.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for six==1.16.0
+Best match: six 1.16.0
+Adding six 1.16.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for setuptools==68.0.0
+Best match: setuptools 68.0.0
+Adding setuptools 68.0.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for requests==2.31.0
+Best match: requests 2.31.0
+Adding requests 2.31.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for protobuf==4.24.3
+Best match: protobuf 4.24.3
+Adding protobuf 4.24.3 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for Markdown==3.4.4
+Best match: Markdown 3.4.4
+Adding Markdown 3.4.4 to easy-install.pth file
+Installing markdown_py script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for google-auth-oauthlib==1.0.0
+Best match: google-auth-oauthlib 1.0.0
+Adding google-auth-oauthlib 1.0.0 to easy-install.pth file
+Installing google-oauthlib-tool script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for google-auth==2.23.2
+Best match: google-auth 2.23.2
+Adding google-auth 2.23.2 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for grpcio==1.59.0
+Best match: grpcio 1.59.0
+Adding grpcio 1.59.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for absl-py==2.0.0
+Best match: absl-py 2.0.0
+Adding absl-py 2.0.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for triton==2.0.0
+Best match: triton 2.0.0
+Adding triton 2.0.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-nvtx-cu11==11.7.91
+Best match: nvidia-nvtx-cu11 11.7.91
+Adding nvidia-nvtx-cu11 11.7.91 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-nccl-cu11==2.14.3
+Best match: nvidia-nccl-cu11 2.14.3
+Adding nvidia-nccl-cu11 2.14.3 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cusparse-cu11==11.7.4.91
+Best match: nvidia-cusparse-cu11 11.7.4.91
+Adding nvidia-cusparse-cu11 11.7.4.91 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cusolver-cu11==11.4.0.1
+Best match: nvidia-cusolver-cu11 11.4.0.1
+Adding nvidia-cusolver-cu11 11.4.0.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-curand-cu11==10.2.10.91
+Best match: nvidia-curand-cu11 10.2.10.91
+Adding nvidia-curand-cu11 10.2.10.91 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cufft-cu11==10.9.0.58
+Best match: nvidia-cufft-cu11 10.9.0.58
+Adding nvidia-cufft-cu11 10.9.0.58 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cublas-cu11==11.10.3.66
+Best match: nvidia-cublas-cu11 11.10.3.66
+Adding nvidia-cublas-cu11 11.10.3.66 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cudnn-cu11==8.5.0.96
+Best match: nvidia-cudnn-cu11 8.5.0.96
+Adding nvidia-cudnn-cu11 8.5.0.96 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cuda-cupti-cu11==11.7.101
+Best match: nvidia-cuda-cupti-cu11 11.7.101
+Adding nvidia-cuda-cupti-cu11 11.7.101 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cuda-runtime-cu11==11.7.99
+Best match: nvidia-cuda-runtime-cu11 11.7.99
+Adding nvidia-cuda-runtime-cu11 11.7.99 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for nvidia-cuda-nvrtc-cu11==11.7.99
+Best match: nvidia-cuda-nvrtc-cu11 11.7.99
+Adding nvidia-cuda-nvrtc-cu11 11.7.99 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for Jinja2==3.1.2
+Best match: Jinja2 3.1.2
+Adding Jinja2 3.1.2 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for networkx==3.1
+Best match: networkx 3.1
+Adding networkx 3.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for sympy==1.12
+Best match: sympy 1.12
+Adding sympy 1.12 to easy-install.pth file
+Installing isympy script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for typing-extensions==4.8.0
+Best match: typing-extensions 4.8.0
+Adding typing-extensions 4.8.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for filelock==3.12.4
+Best match: filelock 3.12.4
+Adding filelock 3.12.4 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for PyYAML==6.0.1
+Best match: PyYAML 6.0.1
+Adding PyYAML 6.0.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for MarkupSafe==2.1.3
+Best match: MarkupSafe 2.1.3
+Adding MarkupSafe 2.1.3 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for certifi==2023.7.22
+Best match: certifi 2023.7.22
+Adding certifi 2023.7.22 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for urllib3==2.0.6
+Best match: urllib3 2.0.6
+Adding urllib3 2.0.6 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for idna==3.4
+Best match: idna 3.4
+Adding idna 3.4 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for charset-normalizer==3.3.0
+Best match: charset-normalizer 3.3.0
+Adding charset-normalizer 3.3.0 to easy-install.pth file
+Installing normalizer script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for requests-oauthlib==1.3.1
+Best match: requests-oauthlib 1.3.1
+Adding requests-oauthlib 1.3.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for rsa==4.9
+Best match: rsa 4.9
+Adding rsa 4.9 to easy-install.pth file
+Installing pyrsa-decrypt script to /home/DAVIDSON/taawal/.local/bin
+Installing pyrsa-encrypt script to /home/DAVIDSON/taawal/.local/bin
+Installing pyrsa-keygen script to /home/DAVIDSON/taawal/.local/bin
+Installing pyrsa-priv2pub script to /home/DAVIDSON/taawal/.local/bin
+Installing pyrsa-sign script to /home/DAVIDSON/taawal/.local/bin
+Installing pyrsa-verify script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for pyasn1-modules==0.3.0
+Best match: pyasn1-modules 0.3.0
+Adding pyasn1-modules 0.3.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for cachetools==5.3.1
+Best match: cachetools 5.3.1
+Adding cachetools 5.3.1 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for lit==17.0.2
+Best match: lit 17.0.2
+Adding lit 17.0.2 to easy-install.pth file
+Installing lit script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for cmake==3.27.6
+Best match: cmake 3.27.6
+Adding cmake 3.27.6 to easy-install.pth file
+Installing cmake script to /home/DAVIDSON/taawal/.local/bin
+Installing cpack script to /home/DAVIDSON/taawal/.local/bin
+Installing ctest script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for wheel==0.41.2
+Best match: wheel 0.41.2
+Adding wheel 0.41.2 to easy-install.pth file
+Installing wheel script to /home/DAVIDSON/taawal/.local/bin
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for mpmath==1.3.0
+Best match: mpmath 1.3.0
+Adding mpmath 1.3.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for oauthlib==3.2.2
+Best match: oauthlib 3.2.2
+Adding oauthlib 3.2.2 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Searching for pyasn1==0.5.0
+Best match: pyasn1 0.5.0
+Adding pyasn1 0.5.0 to easy-install.pth file
+
+Using /home/DAVIDSON/taawal/.conda/envs/alpha/lib/python3.10/site-packages
+Finished processing dependencies for pointnet2==3.0.0

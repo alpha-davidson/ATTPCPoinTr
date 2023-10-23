@@ -112,6 +112,7 @@ class Metrics(object):
     def _get_emd_distance(cls, pred, gt, eps=0.005, iterations=100):
         emd_loss = cls.ITEMS[3]['eval_object']
         dist, _ = emd_loss(pred, gt, eps, iterations)
+        print(dist)
         emd_out = torch.mean(torch.sqrt(dist))
         return emd_out * 1000
 

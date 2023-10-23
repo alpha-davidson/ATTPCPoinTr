@@ -413,6 +413,8 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                     dense_loss_l2 =  ChamferDisL2(dense_points, gt)
 
                     test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
+                    
+
 
                     _metrics = Metrics.get(dense_points ,gt)
 
@@ -448,6 +450,7 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
 
      
 
+    
     # Print testing results
     shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print_log('============================ TEST RESULTS ============================',logger=logger)
