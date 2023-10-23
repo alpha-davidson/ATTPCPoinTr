@@ -5,15 +5,15 @@ import torch
 import torch.optim as optim
 from timm.scheduler import CosineLRScheduler
 # dataloader
-from datasets import build_dataset_from_cfg
+from datasets import build_dataset_from_cfg, build_my_dataset
 from models import build_model_from_cfg
 # utils
 from utils.logger import *
 from utils.misc import *
 
-def dataset_builder(args, complete_config, partial_config):
-    partial_dataset = build_dataset_from_cfg(partial_config._base_, partial_config.others)
-    complete_dataset = build_dataset_from_cfg(complete_config._base_, complete_config.others)
+def dataset_builder(args, config, test=False):
+    # dataset = build_dataset_from_cfg(config._base_, config.others)
+    dataset = build_my_dataset(config)
     shuffle = False
     if args.distributed:
         # sampler = torch.utils.data.distributed.DistributedSampler(partial_dataset, shuffle = shuffle)
@@ -25,19 +25,13 @@ def dataset_builder(args, complete_config, partial_config):
         assert 1 == 0; 'Currently not setup for multi GPU usage'
     else:
         sampler = None
-        partial_dataloader = torch.utils.data.DataLoader(partial_dataset, batch_size=partial_config.others.bs if shuffle else 1,
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=64 if not test else 1,
                                                 shuffle = shuffle, 
-                                                drop_last = partial_config.others.subset == 'train',
-                                                num_workers = int(args.num_workers),
-                                                worker_init_fn=worker_init_fn)
-        complete_dataloader = torch.utils.data.DataLoader(complete_dataset, batch_size=complete_config.others.bs if shuffle else 1,
-                                                shuffle = shuffle, 
-                                                drop_last = complete_config.others.subset == 'train',
+                                                drop_last = config.others.subset == 'train',
                                                 num_workers = int(args.num_workers),
                                                 worker_init_fn=worker_init_fn)
         
-        
-    return sampler, partial_dataloader, complete_dataloader
+    return sampler, dataloader
 
 def model_builder(config):
     model = build_model_from_cfg(config)
