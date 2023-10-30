@@ -128,7 +128,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
             ret = base_model(partial)
             # coarse_points = ret[0]
             # dense_points = ret[-1]
-            
+
             sparse_loss, dense_loss = base_model.module.get_loss(ret, gt, epoch)
          
             _loss = sparse_loss + dense_loss 
@@ -228,7 +228,9 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
     base_model.eval()  # set model to eval mode
 
-    test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
+    #test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
+    test_losses = AverageMeter(['ValSparseLoss', 'ValDenseLoss'])
+
     test_metrics = AverageMeter(Metrics.names())
     category_metrics = dict()
     n_samples = len(test_dataloader) # bs is 1
@@ -248,45 +250,62 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
             npoints = config.dataset.val.complete.npoints
             dataset_name = 'DummyData -- Lines'
-            if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
-                # partial = data[0].cuda()
-                # gt = data[1].cuda()
-                pass
-            elif 'ShapeNet' in dataset_name:
-                # gt = data.cuda()
-                partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
-                partial = partial.cuda()
-            elif 'Dummy' in dataset_name:
-                gt = c_data.cuda()
-                # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
-                partial = p_data.cuda()
-            else:
-                raise NotImplementedError(f'Train phase does not support {dataset_name}')
-
+            # if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
+            #     # partial = data[0].cuda()
+            #     # gt = data[1].cuda()
+            #     pass
+            # elif 'ShapeNet' in dataset_name:
+            #     # gt = data.cuda()
+            #     partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
+            #     partial = partial.cuda()
+            # elif 'Dummy' in dataset_name:
+            #     gt = c_data.cuda()
+            #     # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
+            #     partial = p_data.cuda()
+            # else:
+            #     raise NotImplementedError(f'Train phase does not support {dataset_name}')
+            gt = c_data.cuda()
+            partial = p_data.cuda()
             ret = base_model(partial)
+
+
+
             coarse_points = ret[0]
             dense_points = ret[-1]
             
             coarse_np = coarse_points.cpu().numpy()
             dense_np = dense_points.cpu().numpy()
 
-            np.save(f'/experiments/RandCutSnowflake/Mg22_Ne20pp_models/randcutofkg/coarse_{model_id}.npy', coarse_np)
-            np.save(f'/experiments/RandCutSnowflake/Mg22_Ne20pp_models/randcutofkg/dense_{model_id}.npy', dense_np)
+            #np.save(f'/experiments/RandCutSnowflake/Mg22_Ne20pp_models/randcutofkg/coarse_{model_id}.npy', coarse_np)
+            #np.save(f'/experiments/RandCutSnowflake/Mg22_Ne20pp_models/randcutofkg/dense_{model_id}.npy', dense_np)
 
             # assert not np.array_equal(dense_points.squeeze().cpu().numpy()[0], dense_points.squeeze().cpu().numpy()[1]), f'Identical Events at epcoh {epoch} in batch {idx}'
 
-            sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
-            sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
-            dense_loss_l1 =  ChamferDisL1(dense_points, gt)
-            dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+            # sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
+            # sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
+            # dense_loss_l1 =  ChamferDisL1(dense_points, gt)
+            # dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+            
+            x = base_model
+            x.train()
+            val_ret = x(partial)
+
+            val_sparse_loss, val_dense_loss = base_model.module.get_loss(val_ret, gt, epoch)
+
+
+            # if args.distributed:
+            #    sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
+            #    sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
+            #    dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
+            #    dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
 
             if args.distributed:
-                sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
-                sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
-                dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
-                dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
+                val_sparse_loss = dist_utils.reduce_tensor(val_sparse_loss, args)
+                val_dense_loss = dist_utils.reduce_tensor(val_dense_loss, args)
+            
+            test_losses.update([val_sparse_loss.item(), val_dense_loss.item()])
 
-            test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
+            #test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
             # dense_points_all = dist_utils.gather_tensor(dense_points, args)
             # gt_all = dist_utils.gather_tensor(gt, args)
@@ -304,7 +323,28 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             category_metrics[taxonomy_id].update(_metrics)
 
 
-            if val_writer is not None and idx % 200 == 0:
+            # if val_writer is not None and idx % 50 == 0:
+
+            #     gt_ptcloud = gt.squeeze().cpu().numpy()
+            #     gt_ptcloud_img = misc.better_img(gt_ptcloud)
+            #     val_writer.add_image('Event%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
+
+            #     input_pc = partial.squeeze().detach().cpu().numpy()
+            #     input_pc = misc.better_img(input_pc)
+            #     val_writer.add_image('Event%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
+
+            #     # sparse = coarse_points.squeeze().cpu().numpy()
+            #     # sparse_img = misc.get_ptcloud_img(sparse)
+            #     # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
+
+            #     dense = dense_points.squeeze().cpu().numpy()
+            #     assert np.sum(np.isnan(dense)) == 0, f'{np.sum(np.isnan(dense))} NaNs found in predicted cloud at epoch {epoch}, val batch {idx}'
+            #     dense_img = misc.better_img(dense)
+            #     val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
+                
+            if val_writer is not None and idx <10:  # Log images for the first 10 samples
+
+                print(f"Logging images for sample {idx}")  # Debug print
 
                 gt_ptcloud = gt.squeeze().cpu().numpy()
                 gt_ptcloud_img = misc.better_img(gt_ptcloud)
@@ -314,16 +354,13 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 input_pc = misc.better_img(input_pc)
                 val_writer.add_image('Event%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
 
-                # sparse = coarse_points.squeeze().cpu().numpy()
-                # sparse_img = misc.get_ptcloud_img(sparse)
-                # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
-
                 dense = dense_points.squeeze().cpu().numpy()
                 assert np.sum(np.isnan(dense)) == 0, f'{np.sum(np.isnan(dense))} NaNs found in predicted cloud at epoch {epoch}, val batch {idx}'
                 dense_img = misc.better_img(dense)
                 val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
-                
-        
+
+
+
             # if (idx+1) % interval == 0:
             print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
                         (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
@@ -362,11 +399,19 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     print_log(msg, logger=logger)
 
     # Add testing results to TensorBoard
+    # if val_writer is not None:
+    #     val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
+    #     val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(2), epoch)
+    #     for i, metric in enumerate(test_metrics.items):
+    #         val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
     if val_writer is not None:
         val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
-        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(2), epoch)
+        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(1), epoch)
         for i, metric in enumerate(test_metrics.items):
             val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
+        # New lines to write validation data points to TensorBoard
+        #val_writer.add_scalar('DataPoints/Validation/Sparse', val_sparse_loss.item(), epoch)
+        #val_writer.add_scalar('DataPoints/Validation/Dense', val_dense_loss.item(), epoch)
 
     return Metrics(config.consider_metric, test_metrics.avg())
 
@@ -518,7 +563,7 @@ def validate_ex(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, 
     # Add testing results to TensorBoard
     if val_writer is not None:
         val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
-        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(2), epoch)
+        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(1), epoch)
         for i, metric in enumerate(test_metrics.items):
             val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
 
