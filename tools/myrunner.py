@@ -128,7 +128,13 @@ def run_net(args, config, train_writer=None, val_writer=None):
             ret = base_model(partial)
             # coarse_points = ret[0]
             # dense_points = ret[-1]
+            # print_log("The shape for training prediction is")
+            # print_log(len(ret))
+            # print(ret[0].shape)
 
+            # The shape for training prediction is
+            # 5
+            # torch.Size([64, 128, 3])
             sparse_loss, dense_loss = base_model.module.get_loss(ret, gt, epoch)
          
             _loss = sparse_loss + dense_loss 
@@ -267,8 +273,9 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             gt = c_data.cuda()
             partial = p_data.cuda()
             ret = base_model(partial)
-
-
+            # The shape of the output is
+            # 2
+            # torch.Size([64, 256, 3])
 
             coarse_points = ret[0]
             dense_points = ret[-1]
@@ -307,8 +314,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
             #test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
-            # dense_points_all = dist_utils.gather_tensor(dense_points, args)
-            # gt_all = dist_utils.gather_tensor(gt, args)
+
 
             # _metrics = Metrics.get(dense_points_all, gt_all)
             _metrics = Metrics.get(dense_points, gt)
