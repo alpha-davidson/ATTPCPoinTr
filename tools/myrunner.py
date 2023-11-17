@@ -603,7 +603,7 @@ def test_net(args, config):
 
     test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, logger=logger)
 
-def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, logger = None):
+def test_ex(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, logger = None):
 
     base_model.eval()  # set model to eval mode
 
@@ -723,3 +723,107 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
         msg += '%.5f \t' % value
     print_log(msg, logger=logger)
     return 
+
+import os
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
+
+def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, logger=None):
+    print_log("[TEST] Start testing", logger=logger)
+    base_model.eval()  # set model to eval mode
+
+    test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
+    test_metrics = AverageMeter(Metrics.names())
+    category_metrics = dict()
+    n_samples = len(test_dataloader)  # bs is 1
+
+    # Directory to save images
+    images_dir = './test_images'
+    if not os.path.exists(images_dir):
+        os.makedirs(images_dir)
+
+    with torch.no_grad():
+        for idx, (feats, labels) in enumerate(test_dataloader):
+            p_data = feats
+            c_data = labels
+            taxonomy_id = 'Line'  # Replace with actual taxonomy_id if available
+            model_id = str(idx).zfill(4)  # Replace with actual model_id if available
+
+
+            dataset_name = 'Dummy'
+            if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
+                # Additional dataset-specific processing can be added here
+                pass
+            elif 'ShapeNet' in dataset_name:
+                # Additional dataset-specific processing can be added here
+                pass
+            elif 'Dummy' in dataset_name:
+                gt = c_data.cuda()
+                partial = p_data.cuda()
+            else:
+                raise NotImplementedError(f'Test phase does not support {dataset_name}')
+
+            ret = base_model(partial)
+            coarse_points = ret[0]
+            dense_points = ret[-1]
+
+            sparse_loss_l1 = ChamferDisL1(coarse_points, gt)
+            sparse_loss_l2 = ChamferDisL2(coarse_points, gt)
+            dense_loss_l1 = ChamferDisL1(dense_points, gt)
+            dense_loss_l2 = ChamferDisL2(dense_points, gt)
+
+            test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
+            _metrics = Metrics.get(dense_points, gt)
+
+            if taxonomy_id not in category_metrics:
+                category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
+            category_metrics[taxonomy_id].update(_metrics)
+
+            # Save images
+            # Convert tensors to numpy arrays for visualization
+            gt_np = gt.squeeze().cpu().numpy()  # Ground truth
+            pred_np = dense_points.squeeze().cpu().numpy()  # Predicted
+
+            # Save the ground truth and prediction images
+            gt_img = misc.better_img(gt_np)  # Convert point cloud to image (implement this function as needed)
+            pred_img = misc.better_img(pred_np)  # Convert point cloud to image
+            
+            # Save images to disk
+            plt.imsave(os.path.join(images_dir, f'gt_{model_id}.png'), gt_img)
+            plt.imsave(os.path.join(images_dir, f'pred_{model_id}.png'), pred_img)
+
+            if (idx + 1) % 200 == 0:
+                print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
+                          (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()],
+                           ['%.4f' % m for m in _metrics]), logger=logger)
+
+        for _, v in category_metrics.items():
+            test_metrics.update(v.avg())
+
+    # Print testing results
+    print_log('============================ TEST RESULTS ============================', logger=logger)
+    msg = ''
+    msg += 'Taxonomy\t'
+    msg += '#Sample\t'
+    for metric in test_metrics.items:
+        msg += metric + '\t'
+    msg += '#ModelName\t'
+    print_log(msg, logger=logger)
+
+    for taxonomy_id in category_metrics:
+        msg = ''
+        msg += (taxonomy_id + '\t')
+        msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
+        for value in category_metrics[taxonomy_id].avg():
+            msg += '%.3f \t' % value
+        msg += 'Line' + '\t'  # Replace with actual model name if available
+        print_log(msg, logger=logger)
+
+    msg = ''
+    msg += 'Overall\t\t'
+    for value in test_metrics.avg():
+        msg += '%.3f \t' % value
+    print_log(msg, logger=logger)
+
+    return Metrics(config.consider_metric, test_metrics.avg())

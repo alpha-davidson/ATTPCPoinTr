@@ -11,6 +11,7 @@ from tensorboardX import SummaryWriter
 def main():
     # args
     args = parser.get_args()
+    print_log(args)
     # CUDA
     args.use_gpu = torch.cuda.is_available()
     if args.use_gpu:

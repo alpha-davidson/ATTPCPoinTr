@@ -416,7 +416,7 @@ def rescale_feats(xs, ys, zs):
 
 def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
 
-    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+    assert os.getcwd() == '/home/DAVIDSON/taawal/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
 
     RANGES = {
             'MIN_X': -270.0,
