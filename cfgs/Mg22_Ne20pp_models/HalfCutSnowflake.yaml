@@ -18,21 +18,20 @@ scheduler: {
   }
 }
 
-
 dataset : {
-  train : { partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_train.npy,
+  train : { partial : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_train.npy,
                         npoints: 256},
-            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_train.npy,
+            complete : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_train.npy,
                          npoints: 512},
             others : { subset: 'train'}},
-  test : {  partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_test.npy,
+  test : {  partial : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_test.npy,
                         npoints: 256},
-            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_test.npy,
+            complete : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_test.npy,
                          npoints: 512},
             others : { subset: 'test'}},
-  val : {   partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_val.npy,
+  val : {   partial : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/256p/half_cut_Mg22_val.npy,
                         npoints: 256},
-            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_val.npy,
+            complete : { path: /home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_val.npy,
                       npoints: 512},
             others : { subset: 'val'}}}  
             

@@ -1,0 +1,54 @@
++ GPUS=--config_file
++ PY_ARGS='ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32'
++ CUDA_VISIBLE_DEVICES=--config_file
++ python ../main.py ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32
+/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: '/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/image.so: undefined symbol: _ZN3c104cuda20CUDACachingAllocator9allocatorE'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+Traceback (most recent call last):
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/scripts/../main.py", line 1, in <module>
+    from tools import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/__init__.py", line 3, in <module>
+    from .myrunner import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/myrunner.py", line 6, in <module>
+    from tools import mybuilder as builder
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/mybuilder.py", line 8, in <module>
+    from datasets import build_dataset_from_cfg, build_my_dataset
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/datasets/__init__.py", line 3, in <module>
+    import datasets.KITTIDataset
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/datasets/KITTIDataset.py", line 7, in <module>
+    from .io import IO
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/datasets/io.py", line 3, in <module>
+    import open3d
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/open3d/__init__.py", line 146, in <module>
+    import open3d.ml
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/open3d/ml/__init__.py", line 16, in <module>
+    from . import datasets
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/open3d/ml/datasets.py", line 15, in <module>
+    from open3d._ml3d.datasets import *
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/open3d/_ml3d/datasets/__init__.py", line 3, in <module>
+    from .semantickitti import SemanticKITTI
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/open3d/_ml3d/datasets/semantickitti.py", line 6, in <module>
+    from sklearn.neighbors import KDTree
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/__init__.py", line 83, in <module>
+    from .base import clone
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 22, in <module>
+    from ._param_validation import Interval, validate_params
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/utils/_param_validation.py", line 15, in <module>
+    from .validation import _is_arraylike_not_scalar
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/utils/validation.py", line 28, in <module>
+    from ..utils._array_api import _asarray_with_order, _is_numpy_namespace, get_namespace
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/utils/_array_api.py", line 9, in <module>
+    from .fixes import parse_version
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/sklearn/utils/fixes.py", line 18, in <module>
+    import scipy.stats
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/scipy/stats/__init__.py", line 608, in <module>
+    from ._stats_py import *
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/scipy/stats/_stats_py.py", line 39, in <module>
+    from scipy.spatial.distance import cdist
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/scipy/spatial/__init__.py", line 110, in <module>
+    from ._kdtree import *
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/scipy/spatial/_kdtree.py", line 4, in <module>
+    from ._ckdtree import cKDTree, cKDTreeNode
+ImportError: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.29' not found (required by /home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/scipy/spatial/_ckdtree.cpython-310-x86_64-linux-gnu.so)

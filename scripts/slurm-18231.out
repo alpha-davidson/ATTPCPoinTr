@@ -1,0 +1,12 @@
++ GPUS=--config_file
++ PY_ARGS='ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32'
++ CUDA_VISIBLE_DEVICES=--config_file
++ python ../main.py ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32
+Traceback (most recent call last):
+  File "../main.py", line 1, in <module>
+    from tools import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/__init__.py", line 3, in <module>
+    from .myrunner import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/myrunner.py", line 1, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'

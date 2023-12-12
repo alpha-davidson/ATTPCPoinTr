@@ -1,0 +1,5 @@
++ GPUS=--config_file
++ PY_ARGS='ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32'
++ CUDA_VISIBLE_DEVICES=--config_file
++ python main.py ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32
+python: can't open file 'main.py': [Errno 2] No such file or directory

@@ -1,0 +1,54 @@
++ GPUS=--config_file
++ PY_ARGS='ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32'
++ CUDA_VISIBLE_DEVICES=--config_file
++ python ../main.py ATTPCPoinTr/ATTPCPoinTr/cfgs/Mg22_Ne20pp_models/HalfCutSnowflake.yaml --learning_rate 0.01 --batch_size 32
+/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: '/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/image.so: undefined symbol: _ZN3c104cuda20CUDACachingAllocator9allocatorE'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+Traceback (most recent call last):
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/requests/compat.py", line 11, in <module>
+    import chardet
+ModuleNotFoundError: No module named 'chardet'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/scripts/../main.py", line 1, in <module>
+    from tools import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/__init__.py", line 3, in <module>
+    from .myrunner import run_net
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/myrunner.py", line 6, in <module>
+    from tools import mybuilder as builder
+  File "/home/DAVIDSON/taawal/ATTPCPoinTr/ATTPCPoinTr/tools/mybuilder.py", line 6, in <module>
+    from timm.scheduler import CosineLRScheduler
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/__init__.py", line 2, in <module>
+    from .models import create_model, list_models, is_model, list_modules, model_entrypoint, \
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/models/__init__.py", line 1, in <module>
+    from .byobnet import *
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/models/byobnet.py", line 36, in <module>
+    from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/data/__init__.py", line 7, in <module>
+    from .loader import create_loader
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/data/loader.py", line 12, in <module>
+    from .transforms_factory import create_transform
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/timm/data/transforms_factory.py", line 9, in <module>
+    from torchvision import transforms
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/__init__.py", line 6, in <module>
+    from torchvision import datasets, io, models, ops, transforms, utils
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/datasets/__init__.py", line 1, in <module>
+    from ._optical_flow import FlyingChairs, FlyingThings3D, HD1K, KittiFlow, Sintel
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/datasets/_optical_flow.py", line 13, in <module>
+    from .utils import _read_pfm, verify_str_arg
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/torchvision/datasets/utils.py", line 22, in <module>
+    import requests
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/requests/__init__.py", line 45, in <module>
+    from .exceptions import RequestsDependencyWarning
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/requests/exceptions.py", line 9, in <module>
+    from .compat import JSONDecodeError as CompatJSONDecodeError
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/requests/compat.py", line 13, in <module>
+    import charset_normalizer as chardet
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/charset_normalizer/__init__.py", line 23, in <module>
+    from charset_normalizer.api import from_fp, from_path, from_bytes, normalize
+  File "/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/charset_normalizer/api.py", line 10, in <module>
+    from charset_normalizer.md import mess_ratio
+  File "charset_normalizer/md.py", line 5, in <module>
+ImportError: cannot import name 'COMMON_SAFE_ASCII_CHARACTERS' from 'charset_normalizer.constant' (/home/DAVIDSON/taawal/.conda/envs/alphatodamoon/lib/python3.10/site-packages/charset_normalizer/constant.py)

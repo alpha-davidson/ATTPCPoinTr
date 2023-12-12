@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -133,7 +134,9 @@ dmypy.json
 *.weights
 *.pt
 *.npy
+*.h5
 
+ATTPCPoinTr1/
 experiments/
 data/ShapeNet55-34/shapenet_pc
 data/ShapeNet55-34/clean*
