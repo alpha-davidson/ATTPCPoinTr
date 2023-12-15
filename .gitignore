@@ -162,3 +162,11 @@ inference_result/
 
 *.sh
 
+# Ignore specific directories
+test_images/
+test_images_real/
+test images/
+
+# Ignore file types globally
+*.out
+*.sh
