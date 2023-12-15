@@ -1,26 +1,34 @@
-# SnowflakeNet Transformers for Point Cloud Completion
+# PoinTr: Diverse Point Cloud Completion with Geometry-Aware Transformers
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/pointr-diverse-point-cloud-completion-with/point-cloud-completion-on-shapenet)](https://paperswithcode.com/sota/point-cloud-completion-on-shapenet?p=pointr-diverse-point-cloud-completion-with)
 
-Adaptation led by Tahmid Awal, with contributions from former students including Ben Wagner.
+Created by [Xumin Yu](https://yuxumin.github.io/)\*, [Yongming Rao](https://raoyongming.github.io/)\*, [Ziyi Wang](https://github.com/LavenderLA), [Zuyan Liu](https://github.com/lzy-19), [Jiwen Lu](https://scholar.google.com/citations?user=TN8uDQoAAAAJ&hl=en&authuser=1), [Jie Zhou](https://scholar.google.com/citations?user=6a79aPwAAAAJ&hl=en&authuser=1)
 
-This repository, originally based on the __PoinTr: Diverse Point Cloud Completion with Geometry-Aware Transformers__ model (ICCV 2021 Oral Presentation), has been adapted to focus on SnowflakeNet Transformers for improved point cloud completion. We have implemented various modifications and enhancements to better support our current research objectives.
+Adapted by [Ben Wagner](https://github.com/bewagner1)
 
-SnowflakeNet Transformers provide a more efficient and robust approach for processing and completing point cloud data, especially for complex real-world scenarios. Our current focus lies in exploring and expanding the capabilities of these transformers for diverse applications.
+[[arXiv]](https://arxiv.org/abs/2108.08839) [[Video]](https://youtu.be/mSGphas0p8g) [[Dataset]](./DATASET.md) [[Models]](#pretrained-models) [[supp]](https://yuxumin.github.io/files/PoinTr_supp.pdf)
 
-## Installation and Setup for SnowflakeNet Transformers
+This repository contains PyTorch implementation for __PoinTr: Diverse Point Cloud Completion with Geometry-Aware Transformers__ (ICCV 2021 Oral Presentation).
+
+PoinTr is a transformer-based model for point cloud completion.  By representing the point cloud as a set of unordered groups of points with position embeddings, we convert the point cloud to a sequence of point proxies and employ a transformer encoder-decoder architecture for generation. We also propose two more challenging benchmarks [ShapeNet-55/34](./DATASET.md) with more diverse incomplete point clouds that can better reflect the real-world scenarios to promote future research.
+
+ ### The most successful model for ALPhA's purposes so far has been [SnowflakeNet](https://github.com/AllenXiangX/SnowflakeNet/tree/main), which is included in this repository.
+
+
+## Usage
+
+### [*** ALPhA Quick Start Guide ***](https://drive.google.com/file/d/1xV3PPMM5xpkEPl6BFhsQOH4cuDxEU1c8/view?usp=sharing)
 
 ### Requirements
 
 - PyTorch >= 1.7.0
-- Python >= 3.10
-- CUDA >= 11.0
+- python >= 3.7
+- CUDA >= 9.0
 - GCC >= 4.9 
 - torchvision
 - timm
 - open3d
 - tensorboardX
-
 
 ```
 pip install -r requirements.txt
@@ -50,28 +58,6 @@ Note: If you still get `ModuleNotFoundError: No module named 'gridding'` or some
 ```
 
 That will fix the `ModuleNotFoundError`.
-
-# Chamfer Distance
-cd extensions/chamfer_dist
-python setup.py install --user
-
-# PointNet++
-pip install "git+https://github.com/erikwijmans/Pointnet2_PyTorch.git#egg=pointnet2_ops&subdirectory=pointnet2_ops_lib"
-
-# Cubic Feature Sampling, Gridding & Gridding Reverse, Gridding Loss (For GRNet)
-cd $HOME/extensions/[specific_module]
-python setup.py install --user
-
-
-### New Installation Instructions (As of October 2023)
-
-- Ensure Python version is 3.10 and CUDA version is 11.0 or above.
-- Install dependencies using `pip install -r requirements.txt`.
-- Set CUDA path: `export CUDAPATH=/usr/local/cuda-11`.
-- Install additional required extensions using the provided installation scripts.
-
-These changes are part of our ongoing efforts to enhance the performance and applicability of the SnowflakeNet Transformers in processing point cloud data.
-
 
 
 ### Dataset
