@@ -18,7 +18,8 @@ from utils.config import cfg_from_yaml_file
 from utils import misc
 from datasets.io import IO
 from datasets.data_transforms import Compose
-
+import cv2
+import numpy as np
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -105,15 +106,105 @@ def inference_single(model, pc_path, args, config, root=None):
     
     return
 
+# def add_points_count_to_images(pc, base_img_path):
+#     # Loop through the specific range of images
+#     for i in range(30):  # Since you want to go from 0000 to 0029
+#         # Construct the full image path for the current event, adjusting the format as necessary
+#         img_path = f"{base_img_path}event{i:04d}.png"
+        
+#         # Load the image
+#         img = cv2.imread(img_path)
+#         if img is None:
+#             print(f"Failed to load image from {img_path}. Please check the file path and integrity.")
+#             continue  # Skip to the next image if the current one couldn't be loaded
+
+#         # Add text to the image
+#         font = cv2.FONT_HERSHEY_SIMPLEX
+#         bottomLeftCornerOfText = (10, 50)
+#         fontScale = 1
+#         fontColor = (255, 255, 255)
+#         lineType = 2
+
+#         text = f'Points: {len(pc)}'  # You may want to adjust how pc is passed if it varies per image
+#         cv2.putText(img, text, bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+
+#         # Save the modified image
+#         cv2.imwrite(img_path, img)
+
+
+
+# def my_inference(model, args, config):
+
+#     with torch.no_grad():
+        
+#         _, data_loader = builder.dataset_builder(args, config.dataset.test, test=True)
+
+#         for idx, (feats, labels) in enumerate(data_loader):
+
+#             if idx == args.n_imgs:
+#                 break
+
+#             partial = feats.cuda()
+#             gt = labels.cuda()
+
+#             ret = model(partial)
+
+#             input_pc = partial.squeeze().detach().cpu().numpy()
+#             output_pc = ret[-1].squeeze().detach().cpu().numpy()
+#             gt_pc = gt.squeeze().detach().cpu().numpy()
+
+#             # misc.better_img(input_pc, idx)
+#             # misc.better_img(output_pc, idx, out=True)
+#             # misc.better_img(gt_pc, idx, gt=True)
+
+#             if args.experimental:
+#                 misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+                
+#                 # Assuming `output_img_path` is where you save the generated image
+#                 # and `output_pc` is the generated point cloud used for the image
+#                 print(args.save_img_path)
+
+#                 print("double image printed")
+#             else:
+#                 misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+                
+#                 # and `output_pc` is the generated point cloud used for the image
+#                 print(args.save_img_path)
+#                 print("triple image printed")
+
+
+#     return
+
+
+from utils import misc
+# Other imports remain the same...
+
+def add_points_count_to_images(pc, img_path):
+    # Load the image
+    img = cv2.imread(img_path)
+    if img is None:
+        print(f"Failed to load image from {img_path}. Please check the file path and integrity.")
+        return
+
+    # Add text to the image
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    bottomLeftCornerOfText = (10, 50)
+    fontScale = 100
+    fontColor = (255, 255, 255)
+    lineType = 2
+
+    text = f'Points: {len(pc)}'
+    cv2.putText(img, text, bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+
+    # Save the modified image
+    cv2.imwrite(img_path, img)
+    print(f"Updated image saved to {img_path}")
 
 def my_inference(model, args, config):
-
     with torch.no_grad():
-        
         _, data_loader = builder.dataset_builder(args, config.dataset.test, test=True)
 
         for idx, (feats, labels) in enumerate(data_loader):
-
             if idx == args.n_imgs:
                 break
 
@@ -123,19 +214,17 @@ def my_inference(model, args, config):
             ret = model(partial)
 
             input_pc = partial.squeeze().detach().cpu().numpy()
-            output_pc = ret[-1].squeeze().detach().cpu().numpy()
+            output_pc = ret[-1].squeeze().detach().cpu().numpy()  # This is your output point cloud
             gt_pc = gt.squeeze().detach().cpu().numpy()
 
-            # misc.better_img(input_pc, idx)
-            # misc.better_img(output_pc, idx, out=True)
-            # misc.better_img(gt_pc, idx, gt=True)
+            # Save or update the image path here as needed
+            img_path = f"{args.save_img_path}event{idx:04d}.png"  # Make sure this path is correct
+            print(img_path)
+            # Assuming you save an image for each output point cloud here
+            # Now, add the point count to each saved image
+            add_points_count_to_images(output_pc, img_path)
 
-            if args.experimental:
-                misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config.dataset.test.partial.path)
-            else:
-                misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config.dataset.test.partial.path)
 
-    return
 
 def main():
     args = get_args()
@@ -158,6 +247,11 @@ def main():
 
     my_inference(base_model, args, config)
     # print(args.experimental)
+
+    output_img_base_path = "test_image1s"  # Make sure this base path is correctly defined
+    pc = np.random.rand(100, 3)  # Example point cloud data, replace with actual data relevant to your use case
+
+
 
 if __name__ == '__main__':
     main()

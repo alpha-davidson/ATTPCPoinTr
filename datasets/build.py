@@ -24,7 +24,8 @@ def build_my_dataset(cfg):
     
     """
 
-    feats = np.load(cfg.partial.path)
+    feats = np.load(cfg.partial.path, allow_pickle=True)
+
     if feats.shape != (len(feats), len(feats[0]), 3):
         feats = feats[:, :, :3]
     labels = np.load(cfg.complete.path)

@@ -25,14 +25,14 @@ dataset : {
             complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_train.npy,
                          npoints: 512},
             others : { subset: 'train'}},
-  test : {  partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/2cut_rand_Mg22_test.npy,
-                        npoints: 256},
-            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_test.npy,
+  test : {  partial : { path: data/Mg22-Ne20pp/simulated/512c/384p/modified_latest_data.npy,
+                        npoints: 400},
+            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_train.npy,
                          npoints: 512},
             others : { subset: 'test'}},
-  val : {   partial : { path: data/Mg22-Ne20pp/simulated/512c/256p/2cut_rand_Mg22_val.npy,
+  val : {   partial : { path: data/Mg22-Ne20pp/simulated/512c/384p/modified_latest_data.npy,
                         npoints: 256},
-            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_val.npy,
+            complete : { path: data/Mg22-Ne20pp/simulated/512c/Mg22_size512_convertXYZQ_train.npy,
                       npoints: 512},
             others : { subset: 'val'}}}  
             
@@ -46,6 +46,6 @@ model : {
   }
 total_bs : 64
 step_per_update: 1
-max_epoch : 500
+max_epoch : 5000
 
 consider_metric: CDL1
