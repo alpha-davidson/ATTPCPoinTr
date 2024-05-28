@@ -1,0 +1,51 @@
+optimizer : {
+  type: Adam,
+  kwargs: {
+  lr : 0.001, 
+  weight_decay : 0
+}}
+
+
+scheduler: {
+  type: GradualWarmup,
+  kwargs_1: {
+    step_size: 50,
+    gamma : 0.5
+  },
+  kwargs_2: {
+    multiplier: 1,
+    total_epoch: 200,
+  }
+}
+
+
+dataset : {
+  train : { partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_train.npy,
+                        npoints: 384},
+            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_train.npy,
+                         npoints: 512},
+            others : { subset: 'train'}},
+  test : {  partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_test.npy,
+                        npoints: 384},
+            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_test.npy,
+                         npoints: 512},
+            others : { subset: 'test'}},
+  val : {   partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_val.npy,
+                        npoints: 384},
+            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_val.npy,
+                      npoints: 512},
+            others : { subset: 'val'}}}  
+            
+model : {
+  NAME: SnowFlakeNet, 
+  dim_feat: 512, 
+  num_pc: 128, 
+  num_p0: 384, 
+  radius: 1, 
+  up_factors: [2, 1]
+  }
+total_bs : 64
+step_per_update: 1
+max_epoch : 500
+
+consider_metric: CDL1

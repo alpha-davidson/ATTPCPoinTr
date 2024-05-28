@@ -212,7 +212,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
     base_model.eval()  # set model to eval mode
 
-    test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
+    test_losses = AverageMeter(['ValSparseLoss', 'ValDenseLoss'])
     test_metrics = AverageMeter(Metrics.names())
     category_metrics = dict()
     n_samples = len(test_dataloader) # bs is 1
@@ -245,24 +245,32 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
             else:
                 raise NotImplementedError(f'Train phase does not support {dataset_name}')
 
-            ret = base_model(partial)
-            coarse_points = ret[0]
-            dense_points = ret[-1]
+            val_ret = base_model(partial)
+            dense_points = val_ret[-1]
 
             # assert not np.array_equal(dense_points.squeeze().cpu().numpy()[0], dense_points.squeeze().cpu().numpy()[1]), f'Identical Events at epcoh {epoch} in batch {idx}'
 
-            sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
-            sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
-            dense_loss_l1 =  ChamferDisL1(dense_points, gt)
-            dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+            # sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
+            # sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
+            # dense_loss_l1 =  ChamferDisL1(dense_points, gt)
+            # dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+
+            val_sparse_loss, val_dense_loss = base_model.module.get_val_loss(dense_points, gt, epoch)
+
+
+            # if args.distributed:
+            #    sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
+            #    sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
+            #    dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
+            #    dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
 
             if args.distributed:
-                sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
-                sparse_loss_l2 = dist_utils.reduce_tensor(sparse_loss_l2, args)
-                dense_loss_l1 = dist_utils.reduce_tensor(dense_loss_l1, args)
-                dense_loss_l2 = dist_utils.reduce_tensor(dense_loss_l2, args)
+                val_sparse_loss = dist_utils.reduce_tensor(val_sparse_loss, args)
+                val_dense_loss = dist_utils.reduce_tensor(val_dense_loss, args)
+            
+            test_losses.update([val_sparse_loss, val_dense_loss.item()])
 
-            test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
+            #test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
             # dense_points_all = dist_utils.gather_tensor(dense_points, args)
             # gt_all = dist_utils.gather_tensor(gt, args)
@@ -340,7 +348,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     # Add testing results to TensorBoard
     if val_writer is not None:
         val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
-        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(2), epoch)
+        val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(1), epoch)
         for i, metric in enumerate(test_metrics.items):
             val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
 
@@ -356,7 +364,7 @@ crop_ratio = {
 def test_net(args, config):
     logger = get_logger(args.log_name)
     print_log('Tester start ... ', logger = logger)
-    _, test_dataloader = builder.dataset_builder(args, config.dataset.test)
+    _, test_dataloader = builder.dataset_builder(args, config.dataset.test, test=True)
  
     base_model = builder.model_builder(config.model)
     # load checkpoints
@@ -384,12 +392,12 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
     n_samples = len(test_dataloader) # bs is 1
 
     with torch.no_grad():
-        for idx, (taxonomy_ids, model_ids, data) in enumerate(test_dataloader):
-            taxonomy_id = taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
-            model_id = model_ids[0]
+        for idx, (feats, labels) in enumerate(test_dataloader):
+            taxonomy_id = "Test_taxID"#taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
+            model_id = "Test_modelID"#model_ids[0]
 
-            npoints = config.dataset.test._base_.N_POINTS
-            dataset_name = config.dataset.test._base_.NAME
+            # npoints = config.dataset.test._base_.N_POINTS
+            dataset_name = "Dummy"#config.dataset.test._base_.NAME
             if  'PCN' in dataset_name or 'ProjectShapeNet' in dataset_name:
                 partial = data[0].cuda()
                 gt = data[1].cuda()
@@ -452,6 +460,19 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
                     [partial[0].cpu(), dense_points[0].cpu()]
                 )
                 continue
+            elif "Dummy" in dataset_name:
+                gt = labels.cuda()
+                partial = feats.cuda()
+                preds = base_model(partial)
+                dense_points = preds[-1]
+                dense_loss_l1 =  ChamferDisL1(dense_points, gt)
+                dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+                test_losses.update([0, 0, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
+                assert np.sum(np.isnan(test_losses.val())) == 0, f'NaN found in losses.val() at batch {idx}'
+                assert np.sum(np.isinf(test_losses.val())) == 0, f'Inf found in losses.val() at batch {idx}'
+                _metrics = Metrics.get(dense_points, gt)
+                _metrics = [_metric.item() for _metric in _metrics]
+                test_metrics.update(_metrics)
             else:
                 raise NotImplementedError(f'Train phase do not support {dataset_name}')
 

@@ -272,6 +272,10 @@ class SnowFlakeNet(nn.Module):
         loss_fine = cd3 * 1000
         # losses = [cdc, cd1, cd2, cd3, partial_matching]
         return loss_coarse, loss_fine
+    
+    def get_val_loss(self, pred, gt, epoch=1, **kwargs):
+
+        return 0, self.loss_func_CD(pred, gt) * 1000
 
     def forward(self, point_cloud, return_P0=False):
         """
