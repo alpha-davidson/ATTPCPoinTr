@@ -40,9 +40,9 @@ model : {
   NAME: SnowFlakeNet, 
   dim_feat: 512, 
   num_pc: 128, 
-  num_p0: 384, 
+  num_p0: 128, 
   radius: 1, 
-  up_factors: [2, 1]
+  up_factors: [2, 2]
   }
 total_bs : 64
 step_per_update: 1

@@ -73,6 +73,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
         builder.resume_optimizer(optimizer, args, logger = logger)
     scheduler = builder.build_scheduler(base_model, optimizer, config, last_epoch=start_epoch-1)
 
+
+    torch.autograd.set_detect_anomaly(True)
     # trainval
     # training
     base_model.zero_grad()
@@ -151,7 +153,10 @@ def run_net(args, config, train_writer=None, val_writer=None):
             else:
                 losses.update([sparse_loss.item(), dense_loss.item()])
 
-            assert np.sum(np.isnan(losses.val())) == 0, f'NaN found in losses.val() at epoch {epoch}, batch {idx}'
+            if np.sum(np.isnan(losses.val())) != 0:
+                np.save(f'./NaN/{args.exp_name}_partial_bad_batch.npy', feats.detach().cpu().numpy())
+                np.save(f'./NaN/{args.exp_name}_complete_bad_batch.npy', labels.detach().cpu().numpy())
+                assert np.sum(np.isnan(losses.val())) == 0, f'NaN found in losses.val() at epoch {epoch}, batch {idx}'
 
             if args.distributed:
                 torch.cuda.synchronize()
@@ -203,7 +208,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
         if epoch % 20 == 0:
             builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch{epoch}', args, logger = logger)
         if (config.max_epoch - epoch) < 2:
-            builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch-{epoch:03d}', args, logger = logger)     
+            builder.save_checkpoint(base_model, optimizer, epoch, metrics, best_metrics, f'ckpt-epoch-{epoch:03d}', args, logger = logger)
     if train_writer is not None and val_writer is not None:
         train_writer.close()
         val_writer.close()
