@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 
-def cut_event(origin, event, k):
+def cut_event(origin, event, k, include_q=True):
     '''
     Cuts the k-nearest points to an origin in an event
     '''
@@ -16,9 +16,11 @@ def cut_event(origin, event, k):
     idxs = np.argsort(dists)
     cut = event[idxs[k:]]
 
-    if cut.shape[-1] > 4:
-        return cut[:, :4]
-    elif cut.shape[-1] == 4:
+    feat_lim = 4 if include_q else 3
+
+    if cut.shape[-1] > feat_lim:
+        return cut[:, :feat_lim]
+    elif cut.shape[-1] == feat_lim:
         return cut
     else:
         raise AttributeError("Missing x, y, z, or q")
