@@ -236,36 +236,6 @@ def get_ptcloud_img(ptcloud):
     return img
 
 
-
-def visualize_KITTI(path, data_list, titles = ['input','pred'], cmap=['bwr','autumn'], zdir='y', 
-                         xlim=(-1, 1), ylim=(-1, 1), zlim=(-1, 1) ):
-    fig = plt.figure(figsize=(6*len(data_list),6))
-    cmax = data_list[-1][:,0].max()
-
-    for i in range(len(data_list)):
-        data = data_list[i][:-2048] if i == 1 else data_list[i]
-        color = data[:,0] /cmax
-        ax = fig.add_subplot(1, len(data_list) , i + 1, projection='3d')
-        ax.view_init(30, -120)
-        b = ax.scatter(data[:, 0], data[:, 1], data[:, 2], zdir=zdir, c=color,vmin=-1,vmax=1 ,cmap = cmap[0],s=4,linewidth=0.05, edgecolors = 'black')
-        ax.set_title(titles[i])
-
-        ax.set_axis_off()
-        ax.set_xlim(xlim)
-        ax.set_ylim(ylim)
-        ax.set_zlim(zlim)
-    plt.subplots_adjust(left=0, right=1, bottom=0, top=1, wspace=0.2, hspace=0)
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    pic_path = path + '.png'
-    fig.savefig(pic_path)
-
-    np.save(os.path.join(path, 'input.npy'), data_list[0].numpy())
-    np.save(os.path.join(path, 'pred.npy'), data_list[1].numpy())
-    plt.close(fig)
-
-
 def random_dropping(pc, e):
     up_num = max(64, 768 // (e//50 + 1))
     pc = pc
@@ -386,18 +356,6 @@ def better_img(event):
     return img
 
 
-def get_extremes(event):
-
-    maxes = []
-    mins = []
-
-    for i in range(3):
-        maxes.append(np.max(event[:, i]))
-        mins.append(np.min(event[:, i]))
-
-    return maxes, mins
-
-
 def rescale_feats(xs, ys, zs):
     RANGES = {
             'MIN_X': -270.0,
@@ -436,17 +394,6 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
     input_ax.scatter(input_xs, input_zs, input_ys, s=4)
     output_ax.scatter(output_xs, output_zs, output_ys, s=4)
     gt_ax.scatter(gt_xs, gt_zs, gt_ys, s=4)
-
-    # axes = [input_ax, output_ax, gt_ax]
-
-    # for ax in axes:
-    #     ax.set_xlabel('X')
-    #     ax.set_ylabel('Z')
-    #     ax.set_zlabel('Y')
-
-    #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    #     ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
-    #     ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
 
     input_ax.set_xlabel('X')
     input_ax.set_ylabel('Z')
@@ -505,17 +452,6 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
 
     input_ax.scatter(input_xs, input_zs, input_ys, s=4)
     output_ax.scatter(output_xs, output_zs, output_ys, s=4)
-
-    # axes = [input_ax, output_ax]
-
-    # for ax in axes:
-    #     ax.set_xlabel('X')
-    #     ax.set_ylabel('Z')
-    #     ax.set_zlabel('Y')
-
-    #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    #     ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
-    #     ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
 
     input_ax.set_xlabel('X')
     input_ax.set_ylabel('Z')
