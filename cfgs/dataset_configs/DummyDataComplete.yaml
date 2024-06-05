@@ -1,4 +1,0 @@
-NAME: DummyData
-DATA_PATH: data/DummyData/lines
-N_POINTS: 512
-PC_PATH: data/DummyData/lines/complete

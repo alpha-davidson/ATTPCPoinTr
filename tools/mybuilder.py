@@ -1,37 +1,36 @@
 import os, sys
 # online package
 import torch
+from torch.utils.data import TensorDataset
 # optimizer
 import torch.optim as optim
 from timm.scheduler import CosineLRScheduler
 # dataloader
-from datasets import build_dataset_from_cfg, build_my_dataset
 from models import build_model_from_cfg
 # utils
 from utils.logger import *
 from utils.misc import *
 
 def dataset_builder(args, config, test=False):
-    # dataset = build_dataset_from_cfg(config._base_, config.others)
-    dataset = build_my_dataset(config)
-    shuffle = False
-    if args.distributed:
-        # sampler = torch.utils.data.distributed.DistributedSampler(partial_dataset, shuffle = shuffle)
-        # dataloader = torch.utils.data.DataLoader(partial_dataset, batch_size = config.others.bs if shuffle else 1,
-        #                                     num_workers = int(args.num_workers),
-        #                                     drop_last = config.others.subset == 'train',
-        #                                     worker_init_fn = worker_init_fn,
-        #                                     sampler = sampler)
-        assert 1 == 0; 'Currently not setup for multi GPU usage'
-    else:
-        sampler = None
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=64 if not test else 1,
-                                                shuffle = shuffle, 
-                                                drop_last = config.others.subset == 'train',
-                                                num_workers = int(args.num_workers),
-                                                worker_init_fn=worker_init_fn)
+
+    feats = np.load(config.partial.path)
+    labels = np.load(config.complete.path)
+
+    if feats.shape[-1] != 3:
+        feats = feats[:, :, :3]
+    if labels.shape[-1] != 3:
+        labels = labels[:, :, :3]
+
+    dataset = TensorDataset(torch.Tensor(feats), torch.Tensor(labels))
+    
+    dataloader = torch.utils.data.DataLoader(dataset, 
+                                             batch_size=64 if not test else 1,
+                                             shuffle = False, 
+                                             drop_last = config.others.subset == 'train',
+                                             num_workers = int(args.num_workers),
+                                             worker_init_fn=worker_init_fn)
         
-    return sampler, dataloader
+    return dataloader
 
 def model_builder(config):
     model = build_model_from_cfg(config)
