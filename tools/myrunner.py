@@ -94,48 +94,26 @@ def run_net(args, config, train_writer=None, val_writer=None):
         testing_flag = False
         for idx, (feats, labels) in enumerate(train_dataloader):
             testing_flag = True
-            partial_data = feats
-            complete_data = labels
             data_time.update(time.time() - batch_start_time)
-            # npoints = config.dataset.partial.train._base_.N_POINTS
-            dataset_name = 'DummyData -- Lines'
-            if  'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
-                # partial = data[0].cuda()
-                # gt = data[1].cuda()
-                if config.dataset.train._base_.CARS:
-                    if idx == 0:
-                        print_log('padding while KITTI training', logger=logger)
-                    # partial, gt = misc.random_scale(partial, gt) # specially for KITTI finetune
-                    partial = misc.random_dropping(partial, epoch) # specially for KITTI finetune
 
-            elif 'ShapeNet' in dataset_name:
-                # gt = data.cuda()
-                # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
-                # partial = partial.cuda()
-                pass
-            
-            elif 'Dummy' in dataset_name:
-                gt = complete_data.cuda()
-                # # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
-                partial = partial_data.cuda()
-                pass
-
-            else:
-                raise NotImplementedError(f'Train phase do not support {dataset_name}')
+            in_pc = feats.cuda()
+            gt_pc = labels.cuda()
 
             num_iter += 1
            
-            ret = base_model(partial)
-            # coarse_points = ret[0]
-            # dense_points = ret[-1]
+            out_pcs = base_model(in_pc)
             
-            sparse_loss, dense_loss = base_model.module.get_loss(ret, gt, epoch)
+            sparse_loss, dense_loss = base_model.module.get_loss(out_pcs, gt_pc, epoch)
          
             _loss = sparse_loss + dense_loss 
             _loss.backward()
 
-            assert np.sum(np.isnan(ret[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
-            assert np.sum(np.isinf(ret[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- Infs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isnan(out_pcs[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isinf(out_pcs[-1].squeeze().cpu().numpy())) == 0, f'After Backward -- Infs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.isnan(sparse_loss.item()) == False, f'After _loss.backward -- NaN found in sparse_loss at epoch {epoch} and batch {idx}'
+            assert np.isinf(sparse_loss.item()) == False, f'After _loss.backward -- Inf found in sparse_loss at epoch {epoch} and batch {idx}'
+            assert np.isnan(dense_loss.item()) == False, f'After _loss.backward -- NaN found in dense_loss at epoch {epoch} and batch {idx}'
+            assert np.isinf(dense_loss.item()) == False, f'After _loss.backward -- Inf found in dense_loss at epoch {epoch} and batch {idx}'
 
             # forward
             if num_iter == config.step_per_update:
@@ -152,6 +130,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
                 losses.update([sparse_loss.item(), dense_loss.item()])
 
             assert np.sum(np.isnan(losses.val())) == 0, f'NaN found in losses.val() at epoch {epoch}, batch {idx}'
+            assert np.sum(np.isinf(losses.val())) == 0, f'Inf found in losses.val() at epoch {epoch}, batch {idx}'
 
             if args.distributed:
                 torch.cuda.synchronize()
@@ -191,8 +170,8 @@ def run_net(args, config, train_writer=None, val_writer=None):
 
         if epoch % args.val_freq == 0:
             # Validate the current model
-            assert np.sum(np.isnan(ret[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
-            assert np.sum(np.isinf(ret[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- Infs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isnan(out_pcs[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- NaNs in dataset at epoch == {epoch} and batch == {idx}'
+            assert np.sum(np.isinf(out_pcs[-1].squeeze().cpu().numpy())) == 0, f'Before Validate -- Infs in dataset at epoch == {epoch} and batch == {idx}'
             metrics = validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val_writer, args, config, logger=logger)
 
             # Save ckeckpoints
@@ -214,47 +193,21 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
     test_losses = AverageMeter(['SparseLossL1', 'SparseLossL2', 'DenseLossL1', 'DenseLossL2'])
     test_metrics = AverageMeter(Metrics.names())
-    category_metrics = dict()
     n_samples = len(test_dataloader) # bs is 1
-
-    interval =  n_samples // 10
 
     with torch.no_grad():
         for idx, (feats, labels) in enumerate(test_dataloader):
-            p_data = feats
-            c_data = labels
-            # taxonomy_ids, model_ids, partial_data = p
-            # _, __, complete_data = c
-            taxonomy_id = 'Line' #taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
-            model_id = str(idx).zfill(4) #model_ids[0]
+            in_pc = feats.cuda()
+            gt_pc = labels.cuda()
+            
+            event_id = str(idx).zfill(4)
 
-            npoints = config.dataset.val.complete.npoints
-            dataset_name = 'DummyData -- Lines'
-            if 'PCN' in dataset_name or dataset_name == 'Completion3D' or 'ProjectShapeNet' in dataset_name:
-                # partial = data[0].cuda()
-                # gt = data[1].cuda()
-                pass
-            elif 'ShapeNet' in dataset_name:
-                # gt = data.cuda()
-                partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4) , int(npoints * 3/4)], fixed_points = None)
-                partial = partial.cuda()
-            elif 'Dummy' in dataset_name:
-                gt = c_data.cuda()
-                # partial, _ = misc.seprate_point_cloud(gt, npoints, [int(npoints * 1/4), int(npoints * 3/4)], fixed_points = None)
-                partial = p_data.cuda()
-            else:
-                raise NotImplementedError(f'Train phase does not support {dataset_name}')
+            coarse_points, dense_points = base_model(in_pc)
 
-            ret = base_model(partial)
-            coarse_points = ret[0]
-            dense_points = ret[-1]
-
-            # assert not np.array_equal(dense_points.squeeze().cpu().numpy()[0], dense_points.squeeze().cpu().numpy()[1]), f'Identical Events at epcoh {epoch} in batch {idx}'
-
-            sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
-            sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
-            dense_loss_l1 =  ChamferDisL1(dense_points, gt)
-            dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+            sparse_loss_l1 =  ChamferDisL1(coarse_points, gt_pc)
+            sparse_loss_l2 =  ChamferDisL2(coarse_points, gt_pc)
+            dense_loss_l1 =  ChamferDisL1(dense_points, gt_pc)
+            dense_loss_l2 =  ChamferDisL2(dense_points, gt_pc)
 
             if args.distributed:
                 sparse_loss_l1 = dist_utils.reduce_tensor(sparse_loss_l1, args)
@@ -264,72 +217,41 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
 
             test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
-            # dense_points_all = dist_utils.gather_tensor(dense_points, args)
-            # gt_all = dist_utils.gather_tensor(gt, args)
-
-            # _metrics = Metrics.get(dense_points_all, gt_all)
-            _metrics = Metrics.get(dense_points, gt)
+            _metrics = Metrics.get(dense_points, gt_pc)
             if args.distributed:
                 _metrics = [dist_utils.reduce_tensor(_metric, args).item() for _metric in _metrics]
             else:
                 _metrics = [_metric.item() for _metric in _metrics]
 
-            # for _taxonomy_id in taxonomy_ids:
-            if taxonomy_id not in category_metrics:
-                category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
-            category_metrics[taxonomy_id].update(_metrics)
-
 
             if val_writer is not None and idx % 200 == 0:
 
-                gt_ptcloud = gt.squeeze().cpu().numpy()
+                gt_ptcloud = gt_pc.squeeze().cpu().numpy()
                 gt_ptcloud_img = misc.better_img(gt_ptcloud)
                 val_writer.add_image('Event%02d/DenseGT' % idx, gt_ptcloud_img, epoch, dataformats='HWC')
 
-                input_pc = partial.squeeze().detach().cpu().numpy()
+                input_pc = in_pc.squeeze().detach().cpu().numpy()
                 input_pc = misc.better_img(input_pc)
                 val_writer.add_image('Event%02d/Input'% idx , input_pc, epoch, dataformats='HWC')
-
-                # sparse = coarse_points.squeeze().cpu().numpy()
-                # sparse_img = misc.get_ptcloud_img(sparse)
-                # val_writer.add_image('Event%02d/Sparse' % idx, sparse_img, epoch, dataformats='HWC')
 
                 dense = dense_points.squeeze().cpu().numpy()
                 assert np.sum(np.isnan(dense)) == 0, f'{np.sum(np.isnan(dense))} NaNs found in predicted cloud at epoch {epoch}, val batch {idx}'
                 dense_img = misc.better_img(dense)
                 val_writer.add_image('Event%02d/Dense' % idx, dense_img, epoch, dataformats='HWC')
                 
-        
-            # if (idx+1) % interval == 0:
-            print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
-                        (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
+            print_log('Test[%d/%d] Sample = %s Losses = %s Metrics = %s' %
+                        (idx + 1, n_samples, event_id, ['%.4f' % l for l in test_losses.val()], 
                         ['%.4f' % m for m in _metrics]), logger=logger)
-        for _,v in category_metrics.items():
-            test_metrics.update(v.avg())
+            test_metrics.update(_metrics)
+
+
         print_log('[Validation] EPOCH: %d  Metrics = %s' % (epoch, ['%.4f' % m for m in test_metrics.avg()]), logger=logger)
 
         if args.distributed:
             torch.cuda.synchronize()
      
     # Print testing results
-    # shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print_log('============================ TEST RESULTS ============================',logger=logger)
-    msg = ''
-    msg += 'Taxonomy\t'
-    msg += '#Sample\t'
-    for metric in test_metrics.items:
-        msg += metric + '\t'
-    msg += '#ModelName\t'
-    print_log(msg, logger=logger)
-
-    for taxonomy_id in category_metrics:
-        msg = ''
-        msg += (taxonomy_id + '\t')
-        msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
-        for value in category_metrics[taxonomy_id].avg():
-            msg += '%.3f \t' % value
-        msg += 'Line' + '\t'
-        print_log(msg, logger=logger)
 
     msg = ''
     msg += 'Overall\t\t'
@@ -384,109 +306,38 @@ def test(base_model, test_dataloader, ChamferDisL1, ChamferDisL2, args, config, 
     n_samples = len(test_dataloader) # bs is 1
 
     with torch.no_grad():
-        for idx, (taxonomy_ids, model_ids, data) in enumerate(test_dataloader):
-            taxonomy_id = taxonomy_ids[0] if isinstance(taxonomy_ids[0], str) else taxonomy_ids[0].item()
-            model_id = model_ids[0]
+        for idx, (feats, labels) in enumerate(test_dataloader):
 
-            npoints = config.dataset.test._base_.N_POINTS
-            dataset_name = config.dataset.test._base_.NAME
-            if  'PCN' in dataset_name or 'ProjectShapeNet' in dataset_name:
-                partial = data[0].cuda()
-                gt = data[1].cuda()
+            event_id = str(idx).zfill(4)
+            in_pc = feats.cuda()
+            gt_pc = labels.cuda()
 
-                ret = base_model(partial)
-                coarse_points = ret[0]
-                dense_points = ret[-1]
+            coarse_points, dense_points = base_model(in_pc)
 
-                sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
-                sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
-                dense_loss_l1 =  ChamferDisL1(dense_points, gt)
-                dense_loss_l2 =  ChamferDisL2(dense_points, gt)
+            sparse_loss_l1 = ChamferDisL1(coarse_points, gt_pc)
+            sparse_loss_l2 = ChamferDisL2(coarse_points, gt_pc)
+            dense_loss_l1 = ChamferDisL1(dense_points, gt_pc)
+            dense_loss_l2 = ChamferDisL2(dense_points, gt_pc)
 
-                test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
-
-                # _metrics = Metrics.get(dense_points ,gt)
-                # test_metrics.update(_metrics)
-                _metrics = Metrics.get(dense_points, gt, require_emd=True)
-                
-                if taxonomy_id not in category_metrics:
-                    category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
-                category_metrics[taxonomy_id].update(_metrics)
-
-            elif 'ShapeNet' in dataset_name:
-                gt = data.cuda()
-                choice = [torch.Tensor([1,1,1]),torch.Tensor([1,1,-1]),torch.Tensor([1,-1,1]),torch.Tensor([-1,1,1]),
-                            torch.Tensor([-1,-1,1]),torch.Tensor([-1,1,-1]), torch.Tensor([1,-1,-1]),torch.Tensor([-1,-1,-1])]
-                num_crop = int(npoints * crop_ratio[args.mode])
-                for item in choice:           
-                    partial, _ = misc.seprate_point_cloud(gt, npoints, num_crop, fixed_points = item)
-                    # NOTE: subsample the input
-                    partial = misc.fps(partial, 2048)
-                    ret = base_model(partial)
-                    coarse_points = ret[0]
-                    dense_points = ret[-1]
-
-                    sparse_loss_l1 =  ChamferDisL1(coarse_points, gt)
-                    sparse_loss_l2 =  ChamferDisL2(coarse_points, gt)
-                    dense_loss_l1 =  ChamferDisL1(dense_points, gt)
-                    dense_loss_l2 =  ChamferDisL2(dense_points, gt)
-
-                    test_losses.update([sparse_loss_l1.item() * 1000, sparse_loss_l2.item() * 1000, dense_loss_l1.item() * 1000, dense_loss_l2.item() * 1000])
-
-                    _metrics = Metrics.get(dense_points ,gt)
-
-                    # test_metrics.update(_metrics)
-
-                    if taxonomy_id not in category_metrics:
-                        category_metrics[taxonomy_id] = AverageMeter(Metrics.names())
-                    category_metrics[taxonomy_id].update(_metrics)
-            elif dataset_name == 'KITTI':
-                partial = data.cuda()
-                ret = base_model(partial)
-                dense_points = ret[-1]
-                target_path = os.path.join(args.experiment_path, 'vis_result')
-                if not os.path.exists(target_path):
-                    os.mkdir(target_path)
-                misc.visualize_KITTI(
-                    os.path.join(target_path, f'{model_id}_{idx:03d}'),
-                    [partial[0].cpu(), dense_points[0].cpu()]
-                )
-                continue
-            else:
-                raise NotImplementedError(f'Train phase do not support {dataset_name}')
+            test_losses.update([sparse_loss_l1, sparse_loss_l2, dense_loss_l1, dense_loss_l2])
+            _metrics = Metrics.get(dense_points, gt_pc)
+            test_metrics.update(_metrics)
 
             if (idx+1) % 200 == 0:
-                print_log('Test[%d/%d] Taxonomy = %s Sample = %s Losses = %s Metrics = %s' %
-                            (idx + 1, n_samples, taxonomy_id, model_id, ['%.4f' % l for l in test_losses.val()], 
+                print_log('Test[%d/%d] Event = %s Losses = %s Metrics = %s' %
+                            (idx + 1, n_samples, event_id, ['%.4f' % l for l in test_losses.val()], 
                             ['%.4f' % m for m in _metrics]), logger=logger)
-        if dataset_name == 'KITTI':
-            return
-        for _,v in category_metrics.items():
-            test_metrics.update(v.avg())
+    
         print_log('[TEST] Metrics = %s' % (['%.4f' % m for m in test_metrics.avg()]), logger=logger)
 
      
 
     # Print testing results
-    shapenet_dict = json.load(open('./data/shapenet_synset_dict.json', 'r'))
     print_log('============================ TEST RESULTS ============================',logger=logger)
     msg = ''
-    msg += 'Taxonomy\t'
-    msg += '#Sample\t'
     for metric in test_metrics.items:
         msg += metric + '\t'
-    msg += '#ModelName\t'
     print_log(msg, logger=logger)
-
-
-    for taxonomy_id in category_metrics:
-        msg = ''
-        msg += (taxonomy_id + '\t')
-        msg += (str(category_metrics[taxonomy_id].count(0)) + '\t')
-        for value in category_metrics[taxonomy_id].avg():
-            msg += '%.3f \t' % value
-        msg += shapenet_dict[taxonomy_id] + '\t'
-        print_log(msg, logger=logger)
 
     msg = ''
     msg += 'Overall \t\t'
