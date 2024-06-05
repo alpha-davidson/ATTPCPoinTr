@@ -1,5 +1,5 @@
 optimizer : {
-  type: Adam,
+  type: SGD,
   kwargs: {
   lr : 0.001, 
   weight_decay : 0,
