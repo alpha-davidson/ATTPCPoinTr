@@ -87,7 +87,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
         batch_start_time = time.time()
         batch_time = AverageMeter()
         data_time = AverageMeter()
-        losses = AverageMeter(['SparseLoss', 'DenseLoss', 'ActualLoss'])
+        losses = AverageMeter(['SparseLoss', 'DenseLoss'])
 
         num_iter = 0
 
@@ -151,7 +151,7 @@ def run_net(args, config, train_writer=None, val_writer=None):
                 dense_loss = dist_utils.reduce_tensor(dense_loss, args)
                 losses.update([sparse_loss.item(), dense_loss.item()])
             else:
-                losses.update([sparse_loss.item(), dense_loss.item(), sparse_loss.item()+dense_loss.item()])
+                losses.update([sparse_loss.item(), dense_loss.item()])
 
             if np.sum(np.isnan(losses.val())) != 0:
                 np.save(f'./NaN/{args.exp_name}_partial_bad_batch.npy', feats.detach().cpu().numpy())
@@ -191,7 +191,6 @@ def run_net(args, config, train_writer=None, val_writer=None):
         if train_writer is not None:
             train_writer.add_scalar('Loss/Epoch/Sparse', losses.avg(0), epoch)
             train_writer.add_scalar('Loss/Epoch/Dense', losses.avg(1), epoch)
-            train_writer.add_scalar('Loss/Epoch/Actual', losses.avg(2), epoch)
         print_log('[Training] EPOCH: %d EpochTime = %.3f (s) Losses = %s' %
             (epoch,  epoch_end_time - epoch_start_time, ['%.4f' % l for l in losses.avg()]), logger = logger)
 
@@ -218,7 +217,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     print_log(f"[VALIDATION] Start validating epoch {epoch}", logger = logger)
     base_model.eval()  # set model to eval mode
 
-    test_losses = AverageMeter(['ValSparseLoss', 'ValDenseLoss', 'ValActualLoss'])
+    test_losses = AverageMeter(['ValSparseLoss', 'ValDenseLoss'])
     test_metrics = AverageMeter(Metrics.names())
     category_metrics = dict()
     n_samples = len(test_dataloader) # bs is 1
@@ -275,7 +274,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 val_sparse_loss = dist_utils.reduce_tensor(val_sparse_loss, args)
                 val_dense_loss = dist_utils.reduce_tensor(val_dense_loss, args)
             
-            test_losses.update([val_sparse_loss.item(), val_dense_loss.item(), 1000*(val_sparse_loss.item()+val_dense_loss.item())])
+            test_losses.update([val_sparse_loss.item(), val_dense_loss.item()])
 
             #test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 
@@ -356,7 +355,6 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
     if val_writer is not None:
         val_writer.add_scalar('Loss/Epoch/Sparse', test_losses.avg(0), epoch)
         val_writer.add_scalar('Loss/Epoch/Dense', test_losses.avg(1), epoch)
-        val_writer.add_scalar('Loss/Epoch/Actual', test_losses.avg(2), epoch)
         for i, metric in enumerate(test_metrics.items):
             val_writer.add_scalar('Metric/%s' % metric, test_metrics.avg(i), epoch)
 
