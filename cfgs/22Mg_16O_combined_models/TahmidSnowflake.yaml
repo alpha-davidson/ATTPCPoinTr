@@ -3,6 +3,7 @@ optimizer : {
   kwargs: {
   lr : 0.001, 
   weight_decay : 0,
+  momentum : 1,
   nesterov : True
 }}
 
