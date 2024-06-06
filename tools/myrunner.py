@@ -274,7 +274,7 @@ def validate(base_model, test_dataloader, epoch, ChamferDisL1, ChamferDisL2, val
                 val_sparse_loss = dist_utils.reduce_tensor(val_sparse_loss, args)
                 val_dense_loss = dist_utils.reduce_tensor(val_dense_loss, args)
             
-            test_losses.update([val_sparse_loss.item(), val_dense_loss.item()])
+            test_losses.update([val_sparse_loss.item()*1000, val_dense_loss.item()*1000])
 
             #test_losses.update([sparse_loss_l1.item(), sparse_loss_l2.item(), dense_loss_l1.item(), dense_loss_l2.item()])
 

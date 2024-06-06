@@ -1,10 +1,8 @@
 optimizer : {
-  type: SGD,
+  type: AdamW,
   kwargs: {
-  lr : 0.001, 
-  weight_decay : 0,
-  momentum : 1,
-  nesterov : True
+  lr : 0.0001, 
+  weight_decay : 0.0005
 }}
 
 

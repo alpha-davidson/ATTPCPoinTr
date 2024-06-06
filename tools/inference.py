@@ -131,9 +131,9 @@ def my_inference(model, args, config):
             # misc.better_img(gt_pc, idx, gt=True)
 
             if args.experimental:
-                misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+                misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config)
             else:
-                misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config.dataset.test.partial.path)
+                misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config)
 
     return
 

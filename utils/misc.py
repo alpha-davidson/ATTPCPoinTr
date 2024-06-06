@@ -403,9 +403,9 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
 
     fig, (input_ax, output_ax, gt_ax) = plt.subplots(1, 3, figsize=(18,6), subplot_kw=dict(projection='3d'))
 
-    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2])
-    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2])
-    gt_xs, gt_ys, gt_zs = rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2])
+    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2], cfg)
+    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2], cfg)
+    gt_xs, gt_ys, gt_zs = rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2], cfg)
 
     input_ax.scatter(input_xs, input_zs, input_ys, s=1)
     output_ax.scatter(output_xs, output_zs, output_ys, s=1)
@@ -442,7 +442,7 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
     fig.suptitle('Event '+str(idx).zfill(4))
 
     if path == '':
-        path = '/'.join(cfg.split('/')[:-1]) + '/imgs/'
+        path = '/'.join(cfg.dataset.test.partial.path.split('/')[:-1]) + '/imgs/'
 
     plt.savefig(path+'event'+str(idx).zfill(4)+'.png')
     plt.close()
@@ -466,19 +466,8 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
     input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2])
     output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2])
 
-    input_ax.scatter(input_xs, input_zs, input_ys, s=4)
-    output_ax.scatter(output_xs, output_zs, output_ys, s=4)
-
-    # axes = [input_ax, output_ax]
-
-    # for ax in axes:
-    #     ax.set_xlabel('X')
-    #     ax.set_ylabel('Z')
-    #     ax.set_zlabel('Y')
-
-    #     ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    #     ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
-    #     ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+    input_ax.scatter(input_xs, input_zs, input_ys, s=1)
+    output_ax.scatter(output_xs, output_zs, output_ys, s=1)
 
     input_ax.set_xlabel('X')
     input_ax.set_ylabel('Z')
@@ -488,13 +477,13 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
     output_ax.set_ylabel('Z')
     output_ax.set_zlabel('Y')
 
-    input_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    input_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
-    input_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+    input_ax.set_xlim(xmin=cfg.RANGES.MIN_X, xmax=cfg.RANGES.MAX_X)
+    input_ax.set_ylim(ymin=cfg.RANGES.MIN_Z, ymax=cfg.RANGES.MAX_Z)
+    input_ax.set_zlim(zmin=cfg.RANGES.MIN_Y, zmax=cfg.RANGES.MAX_Y)
 
-    output_ax.set_xlim(xmin=RANGES['MIN_X'], xmax=RANGES['MAX_X'])
-    output_ax.set_ylim(ymin=RANGES['MIN_Z'], ymax=RANGES['MAX_Z'])
-    output_ax.set_zlim(zmin=RANGES['MIN_Y'], zmax=RANGES['MAX_Y'])
+    output_ax.set_xlim(xmin=cfg.RANGES.MIN_X, xmax=cfg.RANGES.MAX_X)
+    output_ax.set_ylim(ymin=cfg.RANGES.MIN_Z, ymax=cfg.RANGES.MAX_Z)
+    output_ax.set_zlim(zmin=cfg.RANGES.MIN_Y, zmax=cfg.RANGES.MAX_Y)
 
     input_ax.set_title('Input')
     output_ax.set_title('Output')
@@ -502,7 +491,7 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
     fig.suptitle('Event '+str(idx).zfill(4))
 
     if path == '':
-        path = '/'.join(cfg.split('/')[:-1]) + '/imgs/'
+        path = '/'.join(cfg.dataset.test.partial.path.split('/')[:-1]) + '/imgs/'
 
     plt.savefig(path+'event'+str(idx).zfill(4)+'.png')
     plt.close()
