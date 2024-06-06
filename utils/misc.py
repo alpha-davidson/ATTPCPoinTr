@@ -358,7 +358,7 @@ def better_img(event, config):
 
     xs, ys, zs = rescale_feats(xs, ys, zs, config)
 
-    ax.scatter(xs, zs, ys)
+    ax.scatter(xs, zs, ys, s=1)
 
     ax.set_xlabel('X')
     ax.set_ylabel('Z')
@@ -403,9 +403,9 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
 
     fig, (input_ax, output_ax, gt_ax) = plt.subplots(1, 3, figsize=(18,6), subplot_kw=dict(projection='3d'))
 
-    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2], cfg)
-    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2], cfg)
-    gt_xs, gt_ys, gt_zs = rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2], cfg)
+    input_xs, input_ys, input_zs = input_pc[:, 0], input_pc[:, 1], input_pc[:, 2]#rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2], cfg)
+    output_xs, output_ys, output_zs = output_pc[:, 0], output_pc[:, 1], output_pc[:, 2]#rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2], cfg)
+    gt_xs, gt_ys, gt_zs = gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2]#rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2], cfg)
 
     input_ax.scatter(input_xs, input_zs, input_ys, s=1)
     output_ax.scatter(output_xs, output_zs, output_ys, s=1)
