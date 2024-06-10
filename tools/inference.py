@@ -47,6 +47,7 @@ def get_args():
     parser.add_argument('--experimental', action='store_true', default=False, help='Flag if the input cloud is from experimental data -- Default == False')
     parser.add_argument('--save_img_path', type=str, default='', help='Where to save output image')
     parser.add_argument('--n_imgs', type=int, default=20, help='sets the number of images saved -- default == first 20 events')
+    parser.add_argument('--normed', action='store_true', default=False)
     args = parser.parse_args()
 
     # assert args.save_vis_img or (args.out_pc_root != '')
@@ -132,6 +133,8 @@ def my_inference(model, args, config):
 
             if args.experimental:
                 misc.experimental_img(input_pc, output_pc, idx, args.save_img_path, config)
+            elif args.normed:
+                misc.normed_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config)
             else:
                 misc.triplet_img(input_pc, output_pc, gt_pc, idx, args.save_img_path, config)
 

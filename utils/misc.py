@@ -403,9 +403,9 @@ def triplet_img(input_pc, output_pc, gt_pc, idx, path, cfg):
 
     fig, (input_ax, output_ax, gt_ax) = plt.subplots(1, 3, figsize=(18,6), subplot_kw=dict(projection='3d'))
 
-    input_xs, input_ys, input_zs = input_pc[:, 0], input_pc[:, 1], input_pc[:, 2]#rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2], cfg)
-    output_xs, output_ys, output_zs = output_pc[:, 0], output_pc[:, 1], output_pc[:, 2]#rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2], cfg)
-    gt_xs, gt_ys, gt_zs = gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2]#rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2], cfg)
+    input_xs, input_ys, input_zs = rescale_feats(input_pc[:, 0], input_pc[:, 1], input_pc[:, 2], cfg)
+    output_xs, output_ys, output_zs = rescale_feats(output_pc[:, 0], output_pc[:, 1], output_pc[:, 2], cfg)
+    gt_xs, gt_ys, gt_zs = rescale_feats(gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2], cfg)
 
     input_ax.scatter(input_xs, input_zs, input_ys, s=1)
     output_ax.scatter(output_xs, output_zs, output_ys, s=1)
@@ -487,6 +487,56 @@ def experimental_img(input_pc, output_pc, idx, path, cfg):
 
     input_ax.set_title('Input')
     output_ax.set_title('Output')
+
+    fig.suptitle('Event '+str(idx).zfill(4))
+
+    if path == '':
+        path = '/'.join(cfg.dataset.test.partial.path.split('/')[:-1]) + '/imgs/'
+
+    plt.savefig(path+'event'+str(idx).zfill(4)+'.png')
+    plt.close()
+
+def normed_img(input_pc, output_pc, gt_pc, idx, path, cfg):
+
+    assert os.getcwd() == '/home/DAVIDSON/bewagner/summer2023/ATTPCPoinTr', f'Current Directory == {os.getcwd()}'
+
+    fig, (input_ax, output_ax, gt_ax) = plt.subplots(1, 3, figsize=(18,6), subplot_kw=dict(projection='3d'))
+
+    input_xs, input_ys, input_zs = input_pc[:, 0], input_pc[:, 1], input_pc[:, 2]
+    output_xs, output_ys, output_zs = output_pc[:, 0], output_pc[:, 1], output_pc[:, 2]
+    gt_xs, gt_ys, gt_zs = gt_pc[:, 0], gt_pc[:, 1], gt_pc[:, 2]
+
+    input_ax.scatter(input_xs, input_zs, input_ys, s=1)
+    output_ax.scatter(output_xs, output_zs, output_ys, s=1)
+    gt_ax.scatter(gt_xs, gt_zs, gt_ys, s=1)
+
+    input_ax.set_xlabel('X')
+    input_ax.set_ylabel('Z')
+    input_ax.set_zlabel('Y')
+
+    output_ax.set_xlabel('X')
+    output_ax.set_ylabel('Z')
+    output_ax.set_zlabel('Y')
+
+    gt_ax.set_xlabel('X')
+    gt_ax.set_ylabel('Z')
+    gt_ax.set_zlabel('Y')
+
+    input_ax.set_xlim(xmin=0, xmax=1)
+    input_ax.set_ylim(ymin=0, ymax=1)
+    input_ax.set_zlim(zmin=0, zmax=1)
+
+    output_ax.set_xlim(xmin=0, xmax=1)
+    output_ax.set_ylim(ymin=0, ymax=1)
+    output_ax.set_zlim(zmin=0, zmax=1)
+
+    gt_ax.set_xlim(xmin=0, xmax=1)
+    gt_ax.set_ylim(ymin=0, ymax=1)
+    gt_ax.set_zlim(zmin=0, zmax=1)
+
+    input_ax.set_title('Input')
+    output_ax.set_title('Output')
+    gt_ax.set_title('Ground Truth')
 
     fig.suptitle('Event '+str(idx).zfill(4))
 
