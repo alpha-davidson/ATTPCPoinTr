@@ -2,8 +2,7 @@ optimizer : {
   type: Adam,
   kwargs: {
   lr : 0.001, 
-  weight_decay : 0,
-  eps : 0.00025
+  weight_decay : 0
 }}
 
 
@@ -21,19 +20,19 @@ scheduler: {
 
 
 dataset : {
-  train : { partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_train.npy,
+  train : { partial : { path: data/22Mg-16O-combo/my_center_cut_combo_train.npy,
                         npoints: 384},
-            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_train.npy,
+            complete : { path: data/22Mg-16O-combo/my_whole_combo_train.npy,
                          npoints: 512},
             others : { subset: 'train'}},
-  test : {  partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_test.npy,
+  test : {  partial : { path: data/22Mg-16O-combo/my_center_cut_combo_test.npy,
                         npoints: 384},
-            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_test.npy,
+            complete : { path: data/22Mg-16O-combo/my_whole_combo_test.npy,
                          npoints: 512},
             others : { subset: 'test'}},
-  val : {   partial : { path: data/22Mg-16O-combo/filtered_mg-o_partial_val.npy,
+  val : {   partial : { path: data/22Mg-16O-combo/my_center_cut_combo_val.npy,
                         npoints: 384},
-            complete : { path: data/22Mg-16O-combo/filtered_mg-o_complete_val.npy,
+            complete : { path: data/22Mg-16O-combo/my_whole_combo_val.npy,
                       npoints: 512},
             others : { subset: 'val'}}}  
             
